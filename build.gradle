@@ -1,0 +1,32 @@
+plugins {
+    id("java")
+}
+
+java {
+    sourceCompatibility = "17"
+}
+
+ext {
+    metaplus_version = "0.1.0"
+    spring_version = "6.2.1"
+    fastjson2_version = "2.0.54"
+    jackson_version = "2.18.2"
+}
+
+group = "com.outofstack.metaplus"
+version = "$metaplus_version"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+test {
+    useJUnitPlatform()
+    jvmArgs(['-XX:+EnableDynamicAgentLoading', '-Xshare:off'])
+}

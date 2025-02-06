@@ -1,0 +1,5 @@
+rootProject.name = "metaplus"
+include("metaplus-common")
+include("metaplus-server")
+include("metaplus-client")
+
