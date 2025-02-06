@@ -1,0 +1,9 @@
+# for test
+
+metaplus:
+  profile: dev
+  es:
+    baseUrl: http://localhost:9200/
+  rest:
+    host: localhost
+    port: 8080

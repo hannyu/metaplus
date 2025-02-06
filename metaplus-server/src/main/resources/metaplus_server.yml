@@ -1,0 +1,9 @@
+# for prod
+
+metaplus:
+  profile: prod
+  es:
+    baseUrl: http://localhost:9200/
+  rest:
+    host: localhost
+    port: 8080

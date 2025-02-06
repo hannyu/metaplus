@@ -1,0 +1,55 @@
+{
+  "fqmn": {
+    "corp": "metaplus",
+    "domain": "meta",
+    "name": "none"
+  },
+  "cts": {
+    "createdBy": "metaplus",
+    "createAt": ""
+  },
+  "meta": {
+    "index": {
+      "name": "i_meta_of_none",
+      "desc": "meta of none",
+      "extend": "",
+      "joinParent": "",
+      "physical": false
+    },
+    "schema": {
+      "mapping": {
+        "dynamic": false,
+        "properties": {
+          "fqmn": {
+            "corp": "keyword",
+            "domain": "keyword",
+            "name": "keyword",
+            "id": {
+              "type": "alias",
+              "path": "_id"
+            }
+          },
+          "cts": {
+            "createdBy": "keyword",
+            "createAt": "date",
+            "updatedBy": "keyword",
+            "updateAt": "date",
+            "version": {
+              "type": "alias",
+              "path": "_version"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "index": false
+          },
+          "plus": {
+            "type": "object",
+            "index": false
+          }
+        }
+      },
+      "setting": {}
+    }
+  }
+}
