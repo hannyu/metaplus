@@ -28,11 +28,13 @@ public class BookStoreTest {
     private EsClient esClient;
 
     @Autowired
+    private MetaService metaService;
+
+    @Autowired
     private DocService docService;
 
     @Autowired
     private DomainService domainService;
-
 
     @Autowired
     private SearchService searchService;
@@ -95,33 +97,33 @@ public class BookStoreTest {
         assertTrue(domainService.existDomain("book"));
 
         // create book
-        MetaplusPatch patch1 = new MetaplusPatch(PatchType.META_PATCH, "::book::isbn-123-1234567");
-        patch1.getMeta()
+        MetaplusDoc doc1 = new MetaplusDoc("::book::isbn-123-1234567");
+        doc1.getMeta()
                 .put("isbn", "123-1234567")
                 .put("title", "钢铁是怎样练成的")
                 .put("pageCount", 5555)
                 .put("isPublished", true)
                 .put("publishDate", DateUtil.formatNow())
                 .put("sth_not_exist", "Yes, i am not exist~");
-        patch1.getPlus().put("desc", "说点啥呢???");
-        docService.metaCreate(patch1);
+        doc1.getPlus().put("desc", "说点啥呢???");
+        metaService.createMeta(doc1);
 
-        MetaplusDoc doc = docService.read("::book::isbn-123-1234567");
+        MetaplusDoc doc = docService.readDoc("::book::isbn-123-1234567");
         log.info("doc: {}", doc);
         assertEquals(5555, doc.getIntegerByPath("$.meta.pageCount"));
 
         // update book
-        MetaplusPatch patch2 = new MetaplusPatch(PatchType.META_PATCH, "::book::isbn-123-1234567");
-        patch2.getMeta().put("pageCount", 6666);
-        docService.metaUpdate(patch2);
+        MetaplusDoc doc2 = new MetaplusDoc("::book::isbn-123-1234567");
+        doc2.getMeta().put("pageCount", 6666);
+        metaService.updateMeta(doc2);
 
-        doc = docService.read("::book::isbn-123-1234567");
+        doc = docService.readDoc("::book::isbn-123-1234567");
         log.info("doc: {}", doc);
         assertEquals(6666, doc.getIntegerByPath("$.meta.pageCount"));
 
         // delete book
-        docService.metaDelete(patch2);
-        boolean isExist = docService.exist("::book::isbn-123-1234567");
+        metaService.deleteMeta(doc2);
+        boolean isExist = metaService.existMeta(new MetaplusDoc("::book::isbn-123-1234567"));
         assertFalse(isExist);
     }
 
@@ -181,22 +183,22 @@ public class BookStoreTest {
                     .put("isbn", isbn)
                     .put("title", books[i])
                     .put("pageCount", rand.nextInt(1000));
-            docService.metaCreate(book);
+            metaService.createMeta(book);
         }
 
         // wait ES build index
         Thread.sleep(1000);
 
         // simple search
-        Hits hits = searchService.simpleSearch("偏见");
+        Hits hits = searchService.simpleSearch("book", "偏见");
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
 
-        hits = searchService.simpleSearch("moby");
+        hits = searchService.simpleSearch("*", "moby");
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
 
-        hits = searchService.simpleSearch("人 +-局外");
+        hits = searchService.simpleSearch("", "人 +-局外");
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
     }

@@ -21,8 +21,8 @@ public class Schema extends JsonObject {
         put(KEY_SETTINGS, settings);
     }
 
-    public Schema(JsonObject schema) {
-        super(schema);
+    public Schema(JsonObject target) {
+        super(target);
         checkAndLoad();
     }
 
@@ -31,7 +31,7 @@ public class Schema extends JsonObject {
         if (null == mappings) {
             throw new IllegalArgumentException("A Schema must have a valid 'mappings'");
         } else if (! (mappings instanceof Properties)) {
-            put(KEY_MAPPINGS, new Properties((JsonObject) mappings));
+            put(KEY_MAPPINGS, new Properties(mappings));
         }
 
         JsonObject settings = getJsonObject(KEY_SETTINGS);

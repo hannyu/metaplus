@@ -13,10 +13,10 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":metaplus-common"))
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.httpcomponents.client5:httpclient5")
-
-    implementation(project(":metaplus-common"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

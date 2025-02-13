@@ -1,32 +1,39 @@
-Bus:
 
-- `POST` /bus/one
-- `POST` /bus/one/{domain}
-- `POST` /bus/bulk/{domain}
+Hello:
+- `GET` /hello
+- `POST` /echo/{name}
+
+Sync:
+- `POST` /sync/one 
+- `POST` /sync/one/{domain}
+- `POST` /sync/bulk/{domain}
+
+Meta :
+- `PUT`    /meta/create/{fqmn}
+- `POST`   /meta/update/{fqmn}
+- `DELETE` /meta/delete/{fqmn}
+- `HEAD`   /meta/exist/{fqmn}
+
+Plus: 
+- `POST`   /plus/update/{fqmn}
 
 Doc:
-
-- `PUT` /doc/create/{fqmn}
-- `POST` /doc/meta_update/{fqmn}
-- `DELETE` /doc/meta_delete/{fqmn}
-- `POST` /doc/plus_update/{fqmn}
 - `GET` /doc/read/{fqmn}
-- `HEAD` /doc/exist/{fqmn}
+
+Search:
+- `GET` /search/simple/{domain}/{text}
+
 
 Domain:
-
 - `PUT` /domain/create/{domain}
 - `POST` /domain/update/{domain}
 - `DELETE` /domain/delete/{domain}
-- `HEAD` /domain/exist/{domain}
 - `GET` /domain/read/{domain}
-- `GET` /domain/schema/{domain}
+- `HEAD` /domain/exist/{domain}
 - `GET` /domain/sample/{domain}
+- `GET` /domain/list
+- `GET` /domain/schema/{domain}
 - `GET` /domain/health/{domain}
 
-Search:
-
-- `GET` /search/simple
-- `GET` /search/_search
 
 

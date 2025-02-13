@@ -27,17 +27,6 @@ public class MetaplusDoc extends MetaplusTemplate {
     public final static String KEY_META = "meta";
     public final static String KEY_PLUS = "plus";
 
-    public MetaplusDoc(JsonObject target) {
-        super(target);
-
-        if (null == getJsonObject(KEY_META)) {
-            setMeta(new JsonObject());
-        }
-        if (null != getJsonObject(KEY_PLUS)) {
-            setPlus(new JsonObject());
-        }
-    }
-
     public MetaplusDoc(String domain, String name) {
         this("", domain, name);
     }
@@ -54,6 +43,19 @@ public class MetaplusDoc extends MetaplusTemplate {
         setPlus(new JsonObject());
     }
 
+    public MetaplusDoc(JsonObject target) {
+        super(target);
+        checkAndLoad();
+    }
+
+    private void checkAndLoad() {
+        if (null == getJsonObject(KEY_META)) {
+            setMeta(new JsonObject());
+        }
+        if (null != getJsonObject(KEY_PLUS)) {
+            setPlus(new JsonObject());
+        }
+    }
 //    /**
 //     * not deep copy
 //     *

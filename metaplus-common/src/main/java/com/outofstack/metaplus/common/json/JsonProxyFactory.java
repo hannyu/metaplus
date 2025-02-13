@@ -6,12 +6,28 @@ import java.io.Reader;
 
 public class JsonProxyFactory {
 
-    private static final boolean fastjson2Present;
-    private static final boolean jacksonPresent;
+    private static boolean fastjson2Present;
+    private static boolean jacksonPresent;
     static {
         ClassLoader loader = JsonProxyFactory.class.getClassLoader();
-        fastjson2Present = ClassUtils.isPresent("com.alibaba.fastjson2.JSON", loader);
-        jacksonPresent = ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", loader);
+
+//        fastjson2Present = ClassUtils.isPresent("com.alibaba.fastjson2.JSON", loader);
+//        jacksonPresent = ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", loader);
+
+        try {
+            loader.loadClass("com.alibaba.fastjson2.JSON");
+            fastjson2Present = true;
+        } catch (Throwable e) {
+            fastjson2Present = false;
+        }
+
+        try {
+            loader.loadClass("com.fasterxml.jackson.databind.ObjectMapper");
+            jacksonPresent = true;
+        } catch (Throwable e) {
+            jacksonPresent = false;
+        }
+
     }
 
     public static JsonObjectProxy createJsonObjectProxy() {

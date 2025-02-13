@@ -3,13 +3,10 @@ package com.outofstack.metaplus.server.service;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.DomainDoc;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
-import com.outofstack.metaplus.common.model.MetaplusPatch;
-import com.outofstack.metaplus.common.model.PatchType;
 import com.outofstack.metaplus.common.model.schema.Properties;
 import com.outofstack.metaplus.common.model.schema.Schema;
 import com.outofstack.metaplus.server.MetaplusException;
 import com.outofstack.metaplus.server.domain.DomainLib;
-import com.outofstack.metaplus.server.dao.IndexDao;
 
 import com.outofstack.metaplus.server.domain.SchemaTuple;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,63 +15,58 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
-public class DomainService {
+public class DomainService extends AbstractService{
 
     @Autowired
-    private DocService docService;
-
-    @Autowired
-    private DomainLib domainLib;
-
-    @Autowired
-    private IndexDao indexDao;
+    private MetaService metaService;
 
     public void createDomain(DomainDoc domainDoc) {
-        // 1. check
-        validateParam(domainDoc);
+        // 1 validate param
+        validateDomainDoc(domainDoc);
         String name = domainDoc.getFqmnName();
         if (domainLib.existDomain(name)) {
             throw new MetaplusException("Domain '" + name + "' already exist");
         }
 
-        // 2. prepare
+        // 2 validate privilege
+        validatePrivilege();
+
+        // 3. build
         String indexName = DomainLib.PREFIX_INDEX + domainDoc.getFqmnName();
         domainDoc.putByPath("$.meta.index.name", indexName);
-        domainDoc.putByPath("$.meta.index.created", false);
         SchemaTuple schemaTuple = domainLib.generateSchemaTuple(domainDoc);
 
-        // 3. create index
+        // 4. create index
         Boolean isAbstract = domainDoc.getBooleanByPath("$.meta.index.abstract");
         if (null == isAbstract || !isAbstract) {
             indexDao.createIndex(indexName, schemaTuple.getPureSchema());
             domainDoc.putByPath("$.meta.index.created", true);
         }
 
-        // 4. create doc
+        // 5. create doc
         domainDoc.setSchema(schemaTuple.getRichSchema());
-        docService.metaCreate(domainDoc);
+        metaService.createMeta(domainDoc);
         domainLib.putDomainDoc(name, domainDoc);
-
-        // 5. read and cache
-//        DomainDoc newDomainDoc = new DomainDoc(docService.read(domainDoc.getFqmn()));
-//        domainLib.putDomainDoc(name, newDomainDoc);
     }
 
     public void updateDomain(DomainDoc domainDoc) {
-        // 1. check
-        validateParam(domainDoc);
+        // 1 validate param
+        validateDomainDoc(domainDoc);
         String name = domainDoc.getFqmnName();
         if (!domainLib.existDomain(name)) {
             throw new MetaplusException("Domain '" + name + "' is not exist");
         }
 
-        // 2. prepare
+        // 2 validate privilege
+        validatePrivilege();
+
+        // 3. build
         DomainDoc oldDoc = domainLib.getDomainDoc(name);
         oldDoc.merge(domainDoc);
         String indexName = oldDoc.getStringByPath("$.meta.index.name");
         Boolean isAbstract = oldDoc.getBooleanByPath("$.meta.index.abstract");
 
-        // 3. index
+        // 4. index
         if (null == isAbstract || !isAbstract) {
             Schema pureSchema = domainLib.rich2PureSchema(oldDoc.getSchema());
             Properties mappings = pureSchema.getMappings();
@@ -88,13 +80,8 @@ public class DomainService {
         }
 
         // 4. doc
-        docService.metaUpdate(MetaplusPatch.copyOf(PatchType.META_PATCH, oldDoc));
+        metaService.updateMeta(oldDoc);
         domainLib.putDomainDoc(name, oldDoc);
-
-        // 4. cache
-//        DomainDoc newDomainDoc = new DomainDoc(docService.read(domainDoc.getFqmn()));
-//        domainLib.putDomainDoc(name, newDomainDoc);
-
     }
 
     public void deleteDomain(DomainDoc domainDoc) {
@@ -113,9 +100,8 @@ public class DomainService {
         }
 
         // 3. doc
-        docService.metaDelete(MetaplusPatch.copyOf(PatchType.META_PATCH, domainDoc));
+        metaService.deleteMeta(domainDoc);
         domainLib.removeDomain(domain);
-
     }
 
     public DomainDoc readDomain(String domain) {
@@ -134,7 +120,10 @@ public class DomainService {
         return domainLib.generateSampleDoc(domain);
     }
 
-    private void validateParam(DomainDoc domainDoc) {
+    /// //////////
+    ///
+
+    private void validateDomainDoc(DomainDoc domainDoc) {
         if (null == domainDoc) {
             throw new IllegalArgumentException("Doc is null");
         }

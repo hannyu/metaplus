@@ -95,17 +95,5 @@ public class DocDao {
         return response.isSuccess();
     }
 
-    /**
-     * FIXME: need more check
-     *
-     * @param patch
-     */
-    private void checkValid(MetaplusPatch patch) {
-        if (null == patch) {
-            throw new IllegalArgumentException("patch can not be null");
-        }
-    }
-
-
 
 }

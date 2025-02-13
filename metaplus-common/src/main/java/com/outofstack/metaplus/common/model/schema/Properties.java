@@ -14,8 +14,8 @@ public class Properties extends JsonObject {
         put(KEY_PROPERTIES, new JsonObject());
     }
 
-    public Properties(JsonObject jsonObject) {
-        super(jsonObject);
+    public Properties(JsonObject target) {
+        super(target);
         checkAndLoad();
     }
 

@@ -10,8 +10,15 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":metaplus-common"))
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
+    implementation("org.springframework:spring-web:$springweb_version")
+    implementation("org.apache.httpcomponents.client5:httpclient5:$apachehttpclient_version")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test {

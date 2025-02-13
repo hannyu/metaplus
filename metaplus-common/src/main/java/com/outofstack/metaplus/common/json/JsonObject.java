@@ -11,15 +11,15 @@ import java.util.Set;
 public class JsonObject {
     protected JsonObjectProxy jop;
 
+    public JsonObject() {
+        jop = JsonProxyFactory.createJsonObjectProxy();
+    }
+
     public JsonObject(JsonObject target) {
         if (null == target) {
             throw new JsonException("Target JsonObject can not be null");
         }
         this.jop = target.jop;
-    }
-
-    public JsonObject() {
-        jop = JsonProxyFactory.createJsonObjectProxy();
     }
 
     public JsonObject(String key, Object value) {
@@ -38,12 +38,12 @@ public class JsonObject {
 
     public <T extends JsonObject> T cast(Class<T> clazz) {
         try {
-            Constructor<T> constructor = clazz.getConstructor();
-            T newobj = constructor.newInstance();
+            Constructor<T> constructor = clazz.getConstructor(JsonObject.class);
+            T newobj = constructor.newInstance(this);
             newobj.jop = jop;
             return newobj;
         } catch (Throwable e) {
-            throw new JsonException("Class '" + clazz + "' newInstance fail", e);
+            throw new JsonException("Cast 'JsonObject' to '" + clazz.getSimpleName() + "' fail", e);
         }
     }
 
@@ -204,7 +204,6 @@ public class JsonObject {
     }
 
     /**
-     *
      *
      * @param key       support a.b.c
      * @param value

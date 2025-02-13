@@ -19,7 +19,7 @@ import com.outofstack.metaplus.common.json.JsonObject;
  *
  */
 @Deprecated
-public class PlusPatch extends MetaplusPatch {
+public class PlusPatch extends OldMetaplusPatch {
     public final static String KEY_PLUS_PATCH = "plusPatch";
 
     public PlusPatch(JsonObject target) {

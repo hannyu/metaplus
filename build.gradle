@@ -8,9 +8,10 @@ java {
 
 ext {
     metaplus_version = "0.1.0"
-    spring_version = "6.2.1"
+    springweb_version = "6.2.1"
     fastjson2_version = "2.0.54"
     jackson_version = "2.18.2"
+    apachehttpclient_version = "5.4.1"
 }
 
 group = "com.outofstack.metaplus"

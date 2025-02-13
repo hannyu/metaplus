@@ -39,7 +39,6 @@ public class EsClient {
                 })
                 .baseUrl(metaplusConfig.getEs().getBaseUrl())
 //                .baseUrl("http://localhost:9200/")
-//                .baseUrl("http://localhost:5120/")
                 .build();
     }
 
@@ -64,9 +63,9 @@ public class EsClient {
             } else {
                 response = restClient.method(HttpMethod.GET)
                         .uri(path)
+                        .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(requestBody)
-                        .accept(MediaType.APPLICATION_JSON)
                         .retrieve()
                         .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
                         .toEntity(JsonObject.class);

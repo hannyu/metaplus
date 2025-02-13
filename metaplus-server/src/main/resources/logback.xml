@@ -4,10 +4,9 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
     <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
-    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}){}  %clr([%10.10t] ${LOG_CORRELATION_PATTERN:-}){faint} %clr(%-30.30logger{29}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
-    <root level="WARN">
+    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}){} %clr([%8.8t] ${LOG_CORRELATION_PATTERN:-}){faint} %clr(%-30.30logger{29}){cyan}%clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <root level="INFO">
         <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
     </root>
     <logger name="org.springframework" level="INFO"/>
     <logger name="ch.qos.logback" level="WARN"/>

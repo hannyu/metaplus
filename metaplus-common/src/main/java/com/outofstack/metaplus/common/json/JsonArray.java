@@ -3,6 +3,7 @@ package com.outofstack.metaplus.common.json;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class JsonArray {
@@ -166,7 +167,21 @@ public class JsonArray {
         return this;
     }
 
+
     public JsonArray add(Object... values) {
+        for (Object v : values) {
+            if (v instanceof JsonObject) {
+                jap.add(((JsonObject) v).jop);
+            } else if (v instanceof  JsonArray) {
+                jap.add(((JsonArray) v).jap);
+            } else {
+                jap.add(v);
+            }
+        }
+        return this;
+    }
+
+    public JsonArray addAll(Object[] values) {
         for (Object v : values) {
             if (v instanceof JsonObject) {
                 jap.add(((JsonObject) v).jop);

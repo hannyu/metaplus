@@ -40,8 +40,8 @@ public class Field extends JsonObject {
         this(type, null);
     }
 
-    public Field(JsonObject jsonObject) {
-        super(jsonObject);
+    public Field(JsonObject target) {
+        super(target);
         checkAndLoad();
     }
 

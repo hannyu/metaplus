@@ -10,8 +10,8 @@ public class Query extends JsonObject {
         put(KEY_QUERY, new JsonObject());
     }
 
-    public Query(JsonObject jsonObject) {
-        super(jsonObject);
+    public Query(JsonObject target) {
+        super(target);
         checkAndLoad();
     }
 

@@ -29,24 +29,6 @@ public abstract class MetaplusTemplate extends JsonObject {
     public static final String REGEX_FQMN_NAME = "^[a-zA-Z0-9][a-zA-Z0-9_.+\\-]{1,400}";
     public static final Pattern PATTERN_FQMN_NAME = Pattern.compile(REGEX_FQMN_NAME);
 
-
-    public MetaplusTemplate(JsonObject target) {
-        super(target);
-
-        JsonObject fqmnjo = target.getJsonObject(KEY_FQMN);
-        if (null == fqmnjo) {
-            throw new IllegalArgumentException("Fqmn can not be null");
-        }
-        String corp = fqmnjo.getString(KEY_FQMN_CORP);
-        String domain = fqmnjo.getString(KEY_FQMN_DOMAIN);
-        String name = fqmnjo.getString(KEY_FQMN_NAME);
-        setFqmn(corp, domain, name);
-
-        if (null == target.getJsonObject(KEY_CTS)) {
-            setCts(new JsonObject());
-        }
-    }
-
     public MetaplusTemplate(String fqmn) {
         super();
         String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
@@ -58,6 +40,26 @@ public abstract class MetaplusTemplate extends JsonObject {
         super();
         setFqmn(corp, domain, name);
         setCts(new JsonObject());
+    }
+
+    public MetaplusTemplate(JsonObject target) {
+        super(target);
+        checkAndLoad();
+    }
+
+    private void checkAndLoad() {
+        JsonObject fqmnJo = getJsonObject(KEY_FQMN);
+        if (null == fqmnJo) {
+            throw new IllegalArgumentException("Fqmn can not be null");
+        }
+        String corp = fqmnJo.getString(KEY_FQMN_CORP);
+        String domain = fqmnJo.getString(KEY_FQMN_DOMAIN);
+        String name = fqmnJo.getString(KEY_FQMN_NAME);
+        setFqmn(corp, domain, name);
+
+        if (null == getJsonObject(KEY_CTS)) {
+            setCts(new JsonObject());
+        }
     }
 
 //    /**

@@ -17,13 +17,14 @@ public class DomainDoc extends MetaplusDoc {
 
     public DomainDoc(JsonObject target) {
         super(target);
-        if (!DOMAIN_DOMAIN.equals(getFqmnDomain())) {
-            throw new IllegalArgumentException("The domain of a domainDoc must be '" + DOMAIN_DOMAIN + "'");
-        }
         checkAndLoad();
     }
 
     private void checkAndLoad() {
+        if (!DOMAIN_DOMAIN.equals(getFqmnDomain())) {
+            throw new IllegalArgumentException("The domain of a domainDoc must be '" + DOMAIN_DOMAIN + "'");
+        }
+
         JsonObject index = getMeta().getJsonObject(KEY_INDEX);
         if (null == index) {
             throw new IllegalArgumentException("A domainDoc must have 'index'");

@@ -10,8 +10,8 @@ public class Hits extends JsonObject {
     public static final String PATH_HITS = "$.hits.hits";
     public static final String PATH_TOTAL_VALUE = "$.hits.total.value";
 
-    public Hits(JsonObject jsonObject) {
-        super(jsonObject);
+    public Hits(JsonObject target) {
+        super(target);
         checkAndLoad();
     }
 

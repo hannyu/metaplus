@@ -32,31 +32,24 @@ public class DomainLib {
     @Autowired
     private EsClient esClient;
 
-    private volatile Map<String, DomainDoc> domainCache = null;
+    private final Map<String, DomainDoc> domainCache = new ConcurrentHashMap<>();;
 
     @PostConstruct
-    private void initDomainCache() {
-//        if (null == domainCache) {
-//            synchronized (this) {
-                if (null == domainCache) {
-                    // FIXME: 100 move to searchDao
-                    String url = "/%s%s/_search?version=true&size=100".formatted(PREFIX_INDEX, DOMAIN_DOMAIN);
-                    EsResponse response = esClient.get(url);
-                    if (! response.isSuccess()) {
-                        throw new MetaplusException("initDomainCache fail, response code:" +
-                                response.getStatusCode() + " and body:" + response.getBody());
-                    }
-                    JsonArray hits = response.getBody().getJsonObject("hits").getJsonArray("hits");
+    private void init() {
+        // FIXME: 100 move to searchDao
+        String url = "/%s%s/_search?version=true&size=100".formatted(PREFIX_INDEX, DOMAIN_DOMAIN);
+        EsResponse response = esClient.get(url);
+        if (! response.isSuccess()) {
+            throw new MetaplusException("initDomainCache fail, response code:" +
+                    response.getStatusCode() + " and body:" + response.getBody());
+        }
+        JsonArray hits = response.getBody().getJsonObject("hits").getJsonArray("hits");
 
-                    domainCache = new ConcurrentHashMap<>();
-                    for (int i=0; i<hits.size(); i++) {
-                        DomainDoc domainDoc = new DomainDoc(hits.getJsonObject(i).getJsonObject("_source"));
-                        String name = domainDoc.getFqmnName();
-                        domainCache.put(name, domainDoc);
-                    }
-                }
-//            }
-//        }
+        for (int i=0; i<hits.size(); i++) {
+            DomainDoc domainDoc = new DomainDoc(hits.getJsonObject(i).getJsonObject("_source"));
+            String name = domainDoc.getFqmnName();
+            domainCache.put(name, domainDoc);
+        }
     }
 
     public DomainDoc getDomainDoc(String domain) {

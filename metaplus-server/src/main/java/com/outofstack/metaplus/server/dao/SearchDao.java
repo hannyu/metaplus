@@ -1,9 +1,6 @@
 package com.outofstack.metaplus.server.dao;
 
 import com.outofstack.metaplus.common.StringUtil;
-import com.outofstack.metaplus.common.json.JsonObject;
-import com.outofstack.metaplus.common.model.DocUtil;
-import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.common.model.search.Hits;
 import com.outofstack.metaplus.common.model.search.Query;
 import com.outofstack.metaplus.server.MetaplusException;
@@ -27,11 +24,11 @@ public class SearchDao {
     @Autowired
     private DomainLib domainLib;
 
-    public Hits query(String domain, Query query) {
-        List<String> domains = new ArrayList<String>(1);
-        domains.add(domain);
-        return query(domains, query);
-    }
+//    public Hits query(String domain, Query query) {
+//        List<String> domains = new ArrayList<String>(1);
+//        domains.add(domain);
+//        return query(domains, query);
+//    }
 
     public Hits query(List<String> domains, Query query) {
         List<String> indexNames = batchDomain2IndexName(domains);

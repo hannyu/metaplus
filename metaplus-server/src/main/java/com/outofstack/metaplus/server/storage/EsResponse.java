@@ -3,10 +3,8 @@ package com.outofstack.metaplus.server.storage;
 import com.outofstack.metaplus.common.json.JsonObject;
 
 public class EsResponse extends JsonObject {
-    private static final String KEY_STATUS_CODE = "status";
+    private static final String KEY_STATUS_CODE = "code";
     private static final String KEY_BODY = "body";
-    private static final String KEY_HEADER = "header";
-
 
     public EsResponse(int statusCode) {
         this(statusCode, null);
