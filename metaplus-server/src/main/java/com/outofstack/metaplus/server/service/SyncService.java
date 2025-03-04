@@ -31,7 +31,7 @@ public class SyncService {
         } else if (method == PatchMethod.PLUS_UPDATE) {
             plusService.updatePlus(patch);
         } else {
-            throw new IllegalArgumentException("Not supported PatchMethod '" + method + "'");
+            throw new IllegalArgumentException("Unsupported PatchMethod '" + method + "'");
         }
 
     }

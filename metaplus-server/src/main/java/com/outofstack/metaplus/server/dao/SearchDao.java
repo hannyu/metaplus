@@ -10,10 +10,7 @@ import com.outofstack.metaplus.server.storage.EsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.StringJoiner;
 
 @Component
 public class SearchDao {
@@ -32,7 +29,7 @@ public class SearchDao {
 
     public Hits query(List<String> domains, Query query) {
         List<String> indexNames = batchDomain2IndexName(domains);
-        String url = "/%s/_search?version=true".formatted(StringUtil.joinString(indexNames, ","));
+        String url = "/%s/_search?version=true".formatted(StringUtil.join(indexNames, ","));
 
         EsResponse response = esClient.get(url, query);
         if (!response.isSuccess()) {

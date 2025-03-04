@@ -68,4 +68,7 @@ public class DateUtil {
         throw new IllegalArgumentException("Can not parse the date, format '" + formated + "'");
     }
 
+    public static int toYmdInt(LocalDate localDate) {
+        return localDate.getYear() * 10000 + localDate.getMonthValue() * 100 + localDate.getDayOfMonth();
+    }
 }

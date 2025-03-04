@@ -5,9 +5,13 @@ import java.util.StringJoiner;
 
 public class StringUtil {
 
-    public static String joinString(List<String> stringList, String delimiter) {
+    /**
+     * joinString(["a", "b", "c"], ":") -> "a:b:c"
+     *
+     */
+    public static String join(List<String> strList, String delimiter) {
         StringJoiner sj = new StringJoiner(delimiter);
-        for (String str : stringList) {
+        for (String str : strList) {
             sj.add(str);
         }
         return sj.toString();

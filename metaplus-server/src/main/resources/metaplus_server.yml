@@ -8,5 +8,9 @@ metaplus:
     port: 8020
 
 
+
+### Do NOT modify
 server:
   port: ${metaplus.rest.port}
+### Do NOT modify
+
