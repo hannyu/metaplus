@@ -1,6 +1,6 @@
 package com.outofstack.metaplus.common.json;
 
-import org.springframework.util.ClassUtils;
+//import org.springframework.util.ClassUtils;
 
 import java.io.Reader;
 
@@ -36,7 +36,7 @@ public class JsonProxyFactory {
         } else if (jacksonPresent) {
             return new JsonObjectProxy4Jackson();
         } else {
-            throw new JsonException("Failed to find any JSON parsing library. Try to import Jackson or Fastjson2.");
+            throw new JsonException("Failed to find any JSON parsing library. Try to import Fastjson2 or Jackson.");
         }
     }
 
@@ -46,7 +46,7 @@ public class JsonProxyFactory {
         } else if (jacksonPresent) {
             return JsonObjectProxy4Jackson.parse(reader);
         } else {
-            throw new JsonException("Failed to find any JSON parsing library. Try to import Jackson or Fastjson2.");
+            throw new JsonException("Failed to find any JSON parsing library. Try to import Fastjson2 or Jackson.");
         }
     }
 
@@ -56,7 +56,7 @@ public class JsonProxyFactory {
         } else if (jacksonPresent) {
             return new JsonArrayProxy4Jackson();
         } else {
-            throw new JsonException("Failed to find any JSON parsing library. Try to import Jackson or Fastjson2.");
+            throw new JsonException("Failed to find any JSON parsing library. Try to import Fastjson2 or Jackson.");
         }
     }
 
@@ -66,7 +66,19 @@ public class JsonProxyFactory {
         } else if (jacksonPresent) {
             return JsonArrayProxy4Jackson.parse(reader);
         } else {
-            throw new JsonException("Failed to find any JSON parsing library. Try to import Jackson or Fastjson2.");
+            throw new JsonException("Failed to find any JSON parsing library. Try to import Fastjson2 or Jackson.");
         }
     }
+
+    public static String object2JsonString(Object object) {
+        if (fastjson2Present) {
+            return JsonObjectProxy4Fastjson2.object2JsonString(object);
+        } else if (jacksonPresent) {
+            return JsonObjectProxy4Jackson.object2JsonString(object);
+        } else {
+            throw new JsonException("Failed to find any JSON parsing library. Try to import Fastjson2 or Jackson.");
+        }
+    }
+
+
 }

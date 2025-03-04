@@ -57,6 +57,11 @@ public class JsonObject {
         return new JsonObject(jop);
     }
 
+    public static String object2JsonString(Object object) {
+        return JsonProxyFactory.object2JsonString(object);
+    }
+
+
     public JsonObject toCopy() {
         JsonObject copy = new JsonObject();
         for (String key : keySet()) {

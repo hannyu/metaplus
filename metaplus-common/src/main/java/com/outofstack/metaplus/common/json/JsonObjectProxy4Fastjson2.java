@@ -30,6 +30,14 @@ public class JsonObjectProxy4Fastjson2 implements JsonObjectProxy {
         return new JsonObjectProxy4Fastjson2(jo);
     }
 
+    public static String object2JsonString(Object object) {
+        try {
+            return JSON.toJSONString(object);
+        } catch (RuntimeException e) {
+            throw new JsonException(e);
+        }
+    }
+
     @Override
     public String toJson() {
         try {

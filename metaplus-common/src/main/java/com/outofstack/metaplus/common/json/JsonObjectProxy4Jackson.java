@@ -1,5 +1,6 @@
 package com.outofstack.metaplus.common.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -36,6 +37,14 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
             return new JsonObjectProxy4Jackson((ObjectNode) jn);
         } else {
             throw new JsonException("Can not parse '" + jn.getNodeType() + "' to JsonObject");
+        }
+    }
+
+    public static String object2JsonString(Object object) {
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
