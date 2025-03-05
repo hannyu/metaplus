@@ -4,27 +4,24 @@ import com.outofstack.metaplus.common.file.TextMmap;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileSyncConsumer {
+public class FileConsumer {
 
     private static final int READ_INTERVAL = 1000;
 
     private Path logpath;
     private Path pospath;
-    private SyncProcessor processor;
 
-    public FileSyncConsumer(Path logpath, Path pospath, SyncProcessor processor) {
+    public FileConsumer(Path logpath, Path pospath) {
 //        if (!Files.isReadable(logpath)) throw new IllegalArgumentException("Can not read logpath '" + logpath + "'");
 //        if (!Files.isWritable(pospath)) throw new IllegalArgumentException("Can not write pospath '" + pospath + "'");
-        if (null == processor) throw new IllegalArgumentException("Processor can not be null");
+//        if (null == processor) throw new IllegalArgumentException("Processor can not be null");
         this.logpath = logpath;
         this.pospath = pospath;
-        this.processor = processor;
     }
 
-    public void start() throws IOException, InterruptedException {
+    public void start(SyncProcessor processor) throws IOException, InterruptedException {
         File logfile = logpath.toFile();
         RandomAccessFile raf = null;
         String lastDatetime = "";

@@ -1,5 +1,6 @@
 package com.outofstack.metaplus.syncer.hive;
 
+import com.outofstack.metaplus.common.file.DailyRollingLogger;
 import com.outofstack.metaplus.common.json.JsonObject;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.MetaStoreEventListener;
@@ -10,16 +11,34 @@ import org.apache.hadoop.hive.metastore.tools.SQLGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.Iterator;
 
 public class PrintJsonHook extends MetaStoreEventListener {
 
+    private static final Logger log = LoggerFactory.getLogger(PrintJsonHook.class);
+
+    private DailyRollingLogger patchlog = null;
     public PrintJsonHook(Configuration config) {
         super(config);
+        try {
+            patchlog = new DailyRollingLogger("");
+        } catch (IOException e) {
+            log.error("Metaplus: Init patchlog fail.", e);
+        }
+
     }
 
-    private static final Logger log = LoggerFactory.getLogger(PrintJsonHook.class);
+    private void printLog(String msg) {
+//        System.out.println(msg);
+        try {
+            patchlog.writeLine(msg);
+        } catch (IOException e) {
+            log.error("Metaplus: Write line fail.", e);
+        }
+
+    }
 
     @Override
     public void onConfigChange(ConfigChangeEvent tableEvent) throws MetaException {
@@ -301,8 +320,4 @@ public class PrintJsonHook extends MetaStoreEventListener {
         printLog("onReload Part: " + JsonObject.object2JsonString(reloadEvent.getPartitionObj()));
     }
 
-    // FIXME: 搞不定log4j了
-    private void printLog(String msg) {
-        System.out.println(msg);
-    }
 }
