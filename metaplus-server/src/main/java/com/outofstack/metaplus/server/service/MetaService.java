@@ -25,7 +25,7 @@ public class MetaService extends AbstractService{
         if (docDao.exist(doc.getFqmn())) {
             throw new MetaplusException("Meta '" + doc.getFqmn() + "' is already exist");
         }
-        fixupCtsCreated(doc);
+        fixupSyncCreated(doc);
         trim2MetaOnly(doc);
 
         // 4 schema
@@ -46,7 +46,7 @@ public class MetaService extends AbstractService{
         if (!docDao.exist(doc.getFqmn())) {
             throw new MetaplusException("Meta '" + doc.getFqmn() + "' does not exist");
         }
-        fixupCtsUpdated(doc);
+        fixupSyncUpdated(doc);
         trim2MetaOnly(doc);
 
         // 3 update doc

@@ -32,7 +32,7 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain" -H 'Content-Type: application/j
           }
         }
       },
-      "cts": {
+      "sync": {
         "properties": {
           "createdBy": {
             "type": "keyword"
@@ -115,7 +115,7 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::none" 
     "domain": "domain",
     "name": "none"
   },
-  "cts": {
+  "sync": {
     "createdBy": "init_script",
     "createdAt": "'`date "+%Y-%m-%dT%H:%M:%S%z"`'"
   },
@@ -143,16 +143,15 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::none" 
               }
             }
           },
-          "cts": {
+          "sync": {
             "properties": {
               "createdBy": {
                 "type": "keyword",
-                "#comment": "A human who create this"
+                "#comment": "Who create this"
               },
               "createdAt": {
                 "type": "date",
-                "#comment": "Date format is yyyy-MM-dd'"'T'"'HH:mm:ss.SSSZ",
-                "#samples": "2025-01-15T18:39:47.082+0800"
+                "#comment": "Date format is yyyy-MM-dd'"'T'"'HH:mm:ss.SSSZ, like 2025-01-15T18:39:47.082+0800"
               },
               "createdFrom": {
                 "type": "keyword",
@@ -205,7 +204,7 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::domain
     "domain": "domain",
     "name": "domain"
   },
-  "cts": {
+  "sync": {
     "createdBy": "init_script",
     "createdAt": "'`date "+%Y-%m-%dT%H:%M:%S%z"`'"
   },

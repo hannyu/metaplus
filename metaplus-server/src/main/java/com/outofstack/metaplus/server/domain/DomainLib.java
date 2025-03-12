@@ -269,8 +269,7 @@ public class DomainLib {
 
     public List<JsonRule> buildJsonRules(Properties mappings) {
         List<JsonRule> jsonRules = new ArrayList<>();
-        String jsonPath = "$";
-        buildJsonRulesRecursively(jsonRules, jsonPath, mappings);
+        buildJsonRulesRecursively(jsonRules, "$", mappings);
         return jsonRules;
     }
 

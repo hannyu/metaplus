@@ -4,7 +4,7 @@
     "domain": "meta",
     "name": "none"
   },
-  "cts": {
+  "sync": {
     "createdBy": "metaplus",
     "createAt": ""
   },
@@ -29,7 +29,7 @@
               "path": "_id"
             }
           },
-          "cts": {
+          "sync": {
             "createdBy": "keyword",
             "createAt": "date",
             "updatedBy": "keyword",

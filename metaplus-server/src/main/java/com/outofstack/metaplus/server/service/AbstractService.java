@@ -56,8 +56,8 @@ public abstract class AbstractService {
         // TODO
     }
 
-    void fixupCtsCreated(MetaplusDoc doc) {
-        String createdAt = doc.getCtsCreatedAt();
+    void fixupSyncCreated(MetaplusDoc doc) {
+        String createdAt = doc.getSyncCreatedAt();
         String newCreatedAt;
         if (null == createdAt || createdAt.isEmpty()) {
             newCreatedAt = DateUtil.formatNow();
@@ -72,13 +72,13 @@ public abstract class AbstractService {
                 }
             }
         }
-        doc.setCtsCreatedAt(newCreatedAt);
-        doc.deleteCtsUpdatedBy();
-        doc.deleteCtsUpdatedAt();
+        doc.setSyncCreatedAt(newCreatedAt);
+        doc.deleteSyncUpdatedBy();
+        doc.deleteSyncUpdatedAt();
     }
 
-    void fixupCtsUpdated(MetaplusDoc doc) {
-        String updatedAt = doc.getCtsUpdatedAt();
+    void fixupSyncUpdated(MetaplusDoc doc) {
+        String updatedAt = doc.getSyncUpdatedAt();
         String newUpdatedAt;
         if (null == updatedAt || updatedAt.isEmpty()) {
             newUpdatedAt = DateUtil.formatNow();
@@ -93,9 +93,9 @@ public abstract class AbstractService {
                 }
             }
         }
-        doc.setCtsUpdatedAt(newUpdatedAt);
-        doc.deleteCtsCreatedBy();
-        doc.deleteCtsCreatedAt();
+        doc.setSyncUpdatedAt(newUpdatedAt);
+        doc.deleteSyncCreatedBy();
+        doc.deleteSyncCreatedAt();
     }
 
     void trim2MetaOnly(MetaplusDoc doc) {

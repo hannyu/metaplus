@@ -18,7 +18,7 @@ public class PlusService extends AbstractService {
         if (!docDao.exist(doc.getFqmn())) {
             throw new MetaplusException("Meta '" + doc.getFqmn() + "' does not exist");
         }
-        fixupCtsUpdated(doc);
+        fixupSyncUpdated(doc);
         trim2PlusOnly(doc);
 
         // 3 update doc

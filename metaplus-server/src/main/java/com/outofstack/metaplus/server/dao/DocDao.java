@@ -76,7 +76,7 @@ public class DocDao {
                     " and body:" + response.getBody());
         }
         MetaplusDoc doc = new MetaplusDoc(response.getBody().getJsonObject("_source"));
-        doc.setCtsVersion(response.getBody().getInteger("_version"));
+        doc.setSyncVersion(response.getBody().getInteger("_version"));
         return doc;
     }
 
