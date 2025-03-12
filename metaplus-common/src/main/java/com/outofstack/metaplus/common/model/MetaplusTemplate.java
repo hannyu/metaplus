@@ -17,29 +17,31 @@ public abstract class MetaplusTemplate extends JsonObject {
     public final static String KEY_FQMN_DOMAIN = "domain";
     public final static String KEY_FQMN_NAME = "name";
 
-    public final static String KEY_CTS = "cts";
-    public final static String KEY_CTS_CREATED_BY = "createdBy";
-    public final static String KEY_CTS_CREATED_AT = "createdAt";
-    public final static String KEY_CTS_UPDATED_BY = "updatedBy";
-    public final static String KEY_CTS_UPDATED_AT = "updatedAt";
-    public final static String KEY_CTS_VERSION = "version";
+    public final static String KEY_SYNC = "sync";
+    public final static String KEY_SYNC_CREATED_BY = "createdBy";
+    public final static String KEY_SYNC_CREATED_AT = "createdAt";
+    public final static String KEY_SYNC_CREATED_FROM = "createdFrom";
+    public final static String KEY_SYNC_UPDATED_BY = "updatedBy";
+    public final static String KEY_SYNC_UPDATED_AT = "updatedAt";
+    public final static String KEY_SYNC_UPDATED_FROM = "updatedFrom";
+    public final static String KEY_SYNC_VERSION = "version";
 
     public static final String REGEX_FQMN_DOMAIN = "^[a-z][a-z0-9_.+\\-]{1,100}";
     public static final Pattern PATTERN_FQMN_DOMAIN = Pattern.compile(REGEX_FQMN_DOMAIN);
-    public static final String REGEX_FQMN_NAME = "^[a-zA-Z0-9][a-zA-Z0-9_.+\\-]{1,400}";
+    public static final String REGEX_FQMN_NAME = "^[a-zA-Z0-9][a-zA-Z0-9_.+()\\-\\[\\]]{1,400}";
     public static final Pattern PATTERN_FQMN_NAME = Pattern.compile(REGEX_FQMN_NAME);
 
     public MetaplusTemplate(String fqmn) {
         super();
         String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         setFqmn(ss[0], ss[1], ss[2]);
-        setCts(new JsonObject());
+        setSync(new JsonObject());
     }
 
     public MetaplusTemplate(String corp, String domain, String name) {
         super();
         setFqmn(corp, domain, name);
-        setCts(new JsonObject());
+        setSync(new JsonObject());
     }
 
     public MetaplusTemplate(JsonObject target) {
@@ -57,8 +59,8 @@ public abstract class MetaplusTemplate extends JsonObject {
         String name = fqmnJo.getString(KEY_FQMN_NAME);
         setFqmn(corp, domain, name);
 
-        if (null == getJsonObject(KEY_CTS)) {
-            setCts(new JsonObject());
+        if (null == getJsonObject(KEY_SYNC)) {
+            setSync(new JsonObject());
         }
     }
 
@@ -77,8 +79,8 @@ public abstract class MetaplusTemplate extends JsonObject {
 //            throw new IllegalArgumentException("MetaTemplate must have valid FQMN");
 //        }
 //
-//        if (null == jsonObject.getJsonObject(KEY_CTS)) {
-//            jsonObject.put(KEY_CTS, new JsonObject());
+//        if (null == jsonObject.getJsonObject(KEY_SYNC)) {
+//            jsonObject.put(KEY_SYNC, new JsonObject());
 //        }
 //        merge(jsonObject);
 //    }
@@ -133,53 +135,78 @@ public abstract class MetaplusTemplate extends JsonObject {
                 jo.getString(KEY_FQMN_NAME);
     }
 
-    public JsonObject getCts() {
-        return getJsonObject(KEY_CTS);
+    public JsonObject getSync() {
+        return getJsonObject(KEY_SYNC);
     }
-    public void setCts(JsonObject cts) {
-        put(KEY_CTS, cts);
+    public void setSync(JsonObject sync) {
+        put(KEY_SYNC, sync);
     }
-    public String getCtsCreatedBy() {
-        return getJsonObject(KEY_CTS).getString(KEY_CTS_CREATED_BY);
+
+    public String getSyncCreatedBy() {
+        return getJsonObject(KEY_SYNC).getString(KEY_SYNC_CREATED_BY);
     }
-    public void setCtsCreatedBy(String createdBy) {
-        getJsonObject(KEY_CTS).put(KEY_CTS_CREATED_BY, createdBy);
+    public void setSyncCreatedBy(String createdBy) {
+        getJsonObject(KEY_SYNC).put(KEY_SYNC_CREATED_BY, createdBy);
     }
-    public void deleteCtsCreatedBy() {
-        getJsonObject(KEY_CTS).remove(KEY_CTS_CREATED_BY);
+    public void deleteSyncCreatedBy() {
+        getJsonObject(KEY_SYNC).remove(KEY_SYNC_CREATED_BY);
     }
-    public String getCtsCreatedAt() {
-        return getJsonObject(KEY_CTS).getString(KEY_CTS_CREATED_AT);
+
+    public String getSyncCreatedAt() {
+        return getJsonObject(KEY_SYNC).getString(KEY_SYNC_CREATED_AT);
     }
-    public void setCtsCreatedAt(String createdAt) {
-        getJsonObject(KEY_CTS).put(KEY_CTS_CREATED_AT, createdAt);
+    public void setSyncCreatedAt(String createdAt) {
+        getJsonObject(KEY_SYNC).put(KEY_SYNC_CREATED_AT, createdAt);
     }
-    public void deleteCtsCreatedAt() {
-        getJsonObject(KEY_CTS).remove(KEY_CTS_CREATED_AT);
+    public void deleteSyncCreatedAt() {
+        getJsonObject(KEY_SYNC).remove(KEY_SYNC_CREATED_AT);
     }
-    public String getCtsUpdatedBy() {
-        return getJsonObject(KEY_CTS).getString(KEY_CTS_UPDATED_BY);
+
+    public String getSyncCreatedFrom() {
+        return getJsonObject(KEY_SYNC).getString(KEY_SYNC_CREATED_FROM);
     }
-    public void setCtsUpdatedBy(String updatedBy) {
-        getJsonObject(KEY_CTS).put(KEY_CTS_UPDATED_BY, updatedBy);
+    public void setSyncCreatedFrom(String createdFrom) {
+        getJsonObject(KEY_SYNC).put(KEY_SYNC_CREATED_FROM, createdFrom);
     }
-    public void deleteCtsUpdatedBy() {
-        getJsonObject(KEY_CTS).remove(KEY_CTS_UPDATED_BY);
+    public void deleteSyncCreatedFrom() {
+        getJsonObject(KEY_SYNC).remove(KEY_SYNC_CREATED_FROM);
     }
-    public String getCtsUpdatedAt() {
-        return getJsonObject(KEY_CTS).getString(KEY_CTS_UPDATED_AT);
+
+    public String getSyncUpdatedBy() {
+        return getJsonObject(KEY_SYNC).getString(KEY_SYNC_UPDATED_BY);
     }
-    public void setCtsUpdatedAt(String updatedAt) {
-        getJsonObject(KEY_CTS).put(KEY_CTS_UPDATED_AT, updatedAt);
+    public void setSyncUpdatedBy(String updatedBy) {
+        getJsonObject(KEY_SYNC).put(KEY_SYNC_UPDATED_BY, updatedBy);
     }
-    public void deleteCtsUpdatedAt() {
-        getJsonObject(KEY_CTS).remove(KEY_CTS_UPDATED_AT);
+    public void deleteSyncUpdatedBy() {
+        getJsonObject(KEY_SYNC).remove(KEY_SYNC_UPDATED_BY);
     }
-    public String getCtsVersion() {
-        return getJsonObject(KEY_CTS).getString(KEY_CTS_VERSION);
+
+    public String getSyncUpdatedAt() {
+        return getJsonObject(KEY_SYNC).getString(KEY_SYNC_UPDATED_AT);
     }
-    public void setCtsVersion(int version) {
-        getJsonObject(KEY_CTS).put(KEY_CTS_VERSION, version);
+    public void setSyncUpdatedAt(String updatedAt) {
+        getJsonObject(KEY_SYNC).put(KEY_SYNC_UPDATED_AT, updatedAt);
+    }
+    public void deleteSyncUpdatedAt() {
+        getJsonObject(KEY_SYNC).remove(KEY_SYNC_UPDATED_AT);
+    }
+
+    public String getSyncUpdatedFrom() {
+        return getJsonObject(KEY_SYNC).getString(KEY_SYNC_UPDATED_FROM);
+    }
+    public void setSyncUpdatedFrom(String updatedFrom) {
+        getJsonObject(KEY_SYNC).put(KEY_SYNC_UPDATED_FROM, updatedFrom);
+    }
+    public void deleteSyncUpdatedFrom() {
+        getJsonObject(KEY_SYNC).remove(KEY_SYNC_UPDATED_FROM);
+    }
+
+    public String getSyncVersion() {
+        return getJsonObject(KEY_SYNC).getString(KEY_SYNC_VERSION);
+    }
+    public void setSyncVersion(int version) {
+        getJsonObject(KEY_SYNC).put(KEY_SYNC_VERSION, version);
     }
 
 }

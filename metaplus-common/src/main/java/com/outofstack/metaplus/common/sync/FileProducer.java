@@ -1,0 +1,35 @@
+package com.outofstack.metaplus.common.sync;
+
+import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.file.DailyRollingLogger;
+import com.outofstack.metaplus.common.model.MetaplusPatch;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
+public class FileProducer {
+
+    private Path logpath;
+    private DailyRollingLogger patchlog = null;
+
+    public FileProducer(Path logpath) {
+        this.logpath = logpath;
+        System.out.println("Metaplus: Init patchlog '" + logpath + "'");
+
+        try {
+            this.patchlog = new DailyRollingLogger(logpath);
+        } catch (IOException e) {
+            System.err.println("Metaplus: Init patchlog fail. Error: " + e.toString());
+        }
+    }
+
+    public void produce(MetaplusPatch patch) {
+        if (null != patchlog && null != patch) {
+            try {
+                patchlog.writeLine(DateUtil.formatNow(), ",", patch.toJson());
+            } catch (IOException e) {
+                System.err.println("Metaplus: Write patchlog fail. Error: " + e.toString());
+            }
+        }
+    }
+}

@@ -10,7 +10,7 @@ public class MetaplusDocTest {
     public void testOne() {
         // init from JsonObject
         JsonObject jo1 = JsonObject.parse("{\"fqmn\": {\"corp\": \"\", \"domain\": \"domain\", \"name\": \"book\"}," +
-                " \"cts\": { \"createdAt\": \"2025-01-21T21:45:00.912+0800\"},\"meta\":{}}");
+                " \"sync\": { \"createdAt\": \"2025-01-21T21:45:00.912+0800\"},\"meta\":{}}");
         MetaplusDoc doc = new MetaplusDoc(jo1);
         System.out.println("doc: " + doc);
         assertEquals("book", doc.getFqmnName());

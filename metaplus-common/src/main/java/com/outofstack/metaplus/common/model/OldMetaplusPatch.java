@@ -10,7 +10,7 @@ import com.outofstack.metaplus.common.json.JsonObject;
  *
  * {
  *     "fqmn": {...},
- *     "cts": {...},
+ *     "sync": {...},
  *     "metaPatch": {
  *         "set": {...},
  *         "add": {...},
@@ -75,7 +75,7 @@ public class OldMetaplusPatch extends MetaplusDoc {
         if (null == doc) throw new IllegalArgumentException("Doc can not be null");
 
         OldMetaplusPatch patch = new OldMetaplusPatch(patchType, doc.getFqmnCorp(), doc.getFqmnDomain(), doc.getFqmnName());
-        if (null != doc.getCts()) patch.setCts(doc.getCts());
+        if (null != doc.getSync()) patch.setSync(doc.getSync());
         if (null != doc.getMeta()) patch.setMeta(doc.getMeta());
         if (null != doc.getPlus()) patch.setPlus(doc.getPlus());
         return patch;

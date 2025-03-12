@@ -11,7 +11,7 @@ import com.outofstack.metaplus.common.json.JsonObject;
  * {
  *     "method": "...",
  *     "fqmn": {...},
- *     "cts": {...},
+ *     "sync": {...},
  *     "metaPatch": {
  *         "set": {...}
  *     }

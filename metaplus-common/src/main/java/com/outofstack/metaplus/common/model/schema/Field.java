@@ -10,7 +10,8 @@ public class Field extends JsonObject {
     public static final String KEY_COMMENT = "#comment";
     public static final String KEY_SAMPLES = "#samples";
 
-    public static final String TYPE_KEYWORD = "keyword";
+//    public static final String TYPE_KEYWORD = "keyword";
+//    public static final String TYPE_TEXT = "text";
 
 
     public Field(String type, Boolean required, Object oDefault, String comment) {
@@ -18,16 +19,16 @@ public class Field extends JsonObject {
         if (null == type) {
             throw new IllegalArgumentException();
         } else {
-            put(KEY_TYPE, type);
+            setType(type);
         }
         if (null != required) {
-            put(KEY_REQUIRED, required);
+            setRequired(required);
         }
         if (null != oDefault) {
-            put(KEY_DEFAULT, oDefault);
+            setDefault(oDefault);
         }
         if (null != comment) {
-            put(KEY_COMMENT, comment);
+            setComment(comment);
         }
     }
     public Field(String type, Boolean required, Object oDefault) {
@@ -78,6 +79,10 @@ public class Field extends JsonObject {
     }
     public void setType(String type) {
         put(KEY_TYPE, type);
+        if ("text".equals(type)) {
+            put("fields", new JsonObject("keyword",
+                    new JsonObject().put("type", "keyword").put("ignore_above", 256)));
+        }
     }
     public String getComment() {
         return getString(KEY_COMMENT);

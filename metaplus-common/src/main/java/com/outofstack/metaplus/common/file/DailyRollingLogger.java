@@ -51,9 +51,11 @@ public class DailyRollingLogger {
         }
     }
 
-    public void writeLine(String line) throws IOException {
+    public void writeLine(String... partOfLine) throws IOException {
         checkAndBackup();
-        buffer.write(line);
+        for (String line : partOfLine) {
+            buffer.write(line);
+        }
         buffer.newLine();
         buffer.flush();
     }

@@ -27,7 +27,7 @@ public class JsonObject {
         put(key, value);
     }
 
-    public JsonObject(Map<String, Object> map) {
+    public JsonObject(Map<String, ?> map) {
         this();
         putAll(map);
     }
@@ -233,7 +233,7 @@ public class JsonObject {
         return this;
     }
 
-    public JsonObject putAll(Map<String, Object> map) {
+    public JsonObject putAll(Map<String, ?> map) {
         for (String key : map.keySet()) {
             Object value = map.get(key);
             put(key, value);
@@ -252,91 +252,131 @@ public class JsonObject {
      * @return
      */
     public Object getByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().get(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().get(entry.getValue());
+        } else {
+            return arrEntry.getKey().get(arrEntry.getValue());
+        }
     }
 
-
     public String getStringByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getString(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getString(entry.getValue());
+        } else {
+            return arrEntry.getKey().getString(arrEntry.getValue());
+        }
     }
 
     public Long getLongByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getLong(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getLong(entry.getValue());
+        } else {
+            return arrEntry.getKey().getLong(arrEntry.getValue());
+        }
     }
 
     public Integer getIntegerByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getInteger(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getInteger(entry.getValue());
+        } else {
+            return arrEntry.getKey().getInteger(arrEntry.getValue());
+        }
     }
 
     public Short getShortByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getShort(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getShort(entry.getValue());
+        } else {
+            return arrEntry.getKey().getShort(arrEntry.getValue());
+        }
     }
 
     public Double getDoubleByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getDouble(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getDouble(entry.getValue());
+        } else {
+            return arrEntry.getKey().getDouble(arrEntry.getValue());
+        }
     }
 
     public Float getFloatByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getFloat(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getFloat(entry.getValue());
+        } else {
+            return arrEntry.getKey().getFloat(arrEntry.getValue());
+        }
     }
 
     public Boolean getBooleanByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getBoolean(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getBoolean(entry.getValue());
+        } else {
+            return arrEntry.getKey().getBoolean(arrEntry.getValue());
+        }
     }
 
     public JsonObject getJsonObjectByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
-        return entry.getKey().getJsonObject(entry.getValue());
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().getJsonObject(entry.getValue());
+        } else {
+            return arrEntry.getKey().getJsonObject(arrEntry.getValue());
+        }
     }
 
     public JsonArray getJsonArrayByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return null;
+
         return entry.getKey().getJsonArray(entry.getValue());
     }
 
     public boolean containsByPath(String jsonPath) {
-        Map.Entry<JsonObject, String> entry = findLastSecondNode(jsonPath);
+        Map.Entry<JsonObject, String> entry = findLastSecondNode(this, jsonPath);
         if (null == entry) return false;
-        return entry.getKey().containsKey(entry.getValue());
-    }
 
-    private Map.Entry<JsonObject, String> findLastSecondNode(String jsonPath) {
-        if (null == jsonPath || !jsonPath.startsWith("$.") || jsonPath.length() < 3) {
-            throw new JsonException("Invalid json path: " + jsonPath);
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(entry.getKey(), entry.getValue());
+        if (null == arrEntry) {
+            return entry.getKey().containsKey(entry.getValue());
+        } else {
+            return arrEntry.getKey().get(arrEntry.getValue()) != null;
         }
-
-        String[] nodes = jsonPath.split("\\.");
-        // $, a, b, ..., x
-
-        JsonObject tempJo = this;
-        for (int i=1; i<nodes.length-1; i++) {
-            tempJo = tempJo.getJsonObject(nodes[i]);
-            if (null == tempJo) {
-                return null;
-            }
-        }
-        return Map.entry(tempJo, nodes[nodes.length-1]);
     }
-
-
 
     /**
      *
@@ -354,18 +394,33 @@ public class JsonObject {
 
         JsonObject tempJo = this;
         for (int i=1; i<nodes.length-1; i++) {
-            if (null == tempJo.getJsonObject(nodes[i])) {
-                tempJo.put(nodes[i], new JsonObject());
+            Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(tempJo, nodes[i]);
+            if (null == arrEntry) {
+                if (null == tempJo.getJsonObject(nodes[i])) {
+                    tempJo.put(nodes[i], new JsonObject());
+                }
+                tempJo = tempJo.getJsonObject(nodes[i]);
+            } else {
+                tempJo = arrEntry.getKey().getJsonObject(arrEntry.getValue());
+                if (null == tempJo) {
+                    throw new JsonException("Invalid pathNode: " + nodes[i]);
+                }
             }
-            tempJo = tempJo.getJsonObject(nodes[i]);
         }
-        tempJo.put(nodes[nodes.length-1], value);
+
+        Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(tempJo, nodes[nodes.length-1]);
+        if (null == arrEntry) {
+            tempJo.put(nodes[nodes.length-1], value);
+        } else {
+            arrEntry.getKey().add(arrEntry.getValue(), value);
+        }
+
         return this;
     }
 
     public JsonObject removeByPath(String jsonPath) {
         if (null == jsonPath || !jsonPath.startsWith("$.") || jsonPath.length() < 3) {
-            throw new JsonException("Invalid json path: " + jsonPath);
+            throw new JsonException("Invalid jsonPath: " + jsonPath);
         }
 
         String[] nodes = jsonPath.split("\\.");
@@ -373,10 +428,18 @@ public class JsonObject {
 
         JsonObject tempJo = this;
         for (int i=1; i<nodes.length-1; i++) {
-            if (null == tempJo.getJsonObject(nodes[i])) {
-                tempJo.put(nodes[i], new JsonObject());
+            Map.Entry<JsonArray, Integer> arrEntry = unpackArrayNode(tempJo, nodes[i]);
+            if (null == arrEntry) {
+                if (null == tempJo.getJsonObject(nodes[i])) {
+                    tempJo.put(nodes[i], new JsonObject());
+                }
+                tempJo = tempJo.getJsonObject(nodes[i]);
+            } else {
+                tempJo = arrEntry.getKey().getJsonObject(arrEntry.getValue());
+                if (null == tempJo) {
+                    throw new JsonException("Invalid pathNode: " + nodes[i]);
+                }
             }
-            tempJo = tempJo.getJsonObject(nodes[i]);
         }
         tempJo.remove(nodes[nodes.length-1]);
         return this;
@@ -437,6 +500,63 @@ public class JsonObject {
             }
         }
         return this;
+    }
+
+
+    /**
+     * abc[12]  => jsonArray, 12
+     *
+     */
+    private static Map.Entry<JsonArray, Integer> unpackArrayNode(JsonObject jsonObject, String pathNode) {
+        if (pathNode.endsWith("]")) {
+            String[] ss = pathNode.split("\\[");
+            if (ss.length == 2) {
+                String key = ss[0];
+                try {
+                    int idx = Integer.parseInt(ss[1].substring(0, ss[1].length()-1));
+                    JsonArray tempJa = jsonObject.getJsonArray(key);
+                    if (null != tempJa) {
+                        return Map.entry(tempJa, idx);
+                    }
+                } catch (NumberFormatException e) {
+                    throw new JsonException("Invalid pathNode: " + pathNode);
+                }
+            } else {
+                throw new JsonException("Invalid pathNode: " + pathNode);
+            }
+        }
+        return null;
+    }
+
+    private static Map.Entry<JsonObject, String> findLastSecondNode(JsonObject jsonObject, String jsonPath) {
+        if (null == jsonPath || !jsonPath.startsWith("$.") || jsonPath.length() < 3) {
+            throw new JsonException("Invalid jsonPath: " + jsonPath);
+        }
+
+        String[] nodes = jsonPath.split("\\.");
+        // $, a, b, ..., x
+
+        JsonObject tempJo = jsonObject;
+        for (int i=1; i<nodes.length-1; i++) {
+            Map.Entry<JsonArray, Integer> entry = unpackArrayNode(tempJo, nodes[i]);
+            if (null == entry) {
+                tempJo = tempJo.getJsonObject(nodes[i]);
+                if (null == tempJo) {
+                    return null;
+                }
+            } else {
+                JsonArray ja = entry.getKey();
+                if (null == ja) {
+                    return null;
+                } else {
+                    tempJo = ja.getJsonObject(entry.getValue());
+                    if (null == tempJo) {
+                        return null;
+                    }
+                }
+            }
+        }
+        return Map.entry(tempJo, nodes[nodes.length-1]);
     }
 
 }

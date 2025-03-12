@@ -1,6 +1,8 @@
 package com.outofstack.metaplus.common.sync;
 
 import com.outofstack.metaplus.common.file.TextMmap;
+import com.outofstack.metaplus.common.json.JsonObject;
+import com.outofstack.metaplus.common.model.MetaplusPatch;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +23,7 @@ public class FileConsumer {
         this.pospath = pospath;
     }
 
-    public void start(SyncProcessor processor) throws IOException, InterruptedException {
+    public void start(ConsumerProcess process) throws IOException, InterruptedException {
         File logfile = logpath.toFile();
         RandomAccessFile raf = null;
         String lastDatetime = "";
@@ -61,8 +63,9 @@ public class FileConsumer {
                         if (sl.length != 2) throw new RuntimeException("Read a unformatted line '" + line + "'");
                         String curDatetime = sl[0];
                         String json = sl[1];
+                        MetaplusPatch patch = new MetaplusPatch(JsonObject.parse(json));
                         if (curDatetime.compareTo(lastDatetime) >= 0) {
-                            processor.doSync(json);
+                            process.doConsumer(patch);
                         }
                         lastReadPos = raf.getFilePointer();
                         lastDatetime = curDatetime;

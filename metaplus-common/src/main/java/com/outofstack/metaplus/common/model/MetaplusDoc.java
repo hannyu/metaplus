@@ -13,7 +13,7 @@ import com.outofstack.metaplus.common.json.JsonObject;
  *         "domain": ...,
  *         "name": ...,
  *     },
- *     "cts": {...},
+ *     "sync": {...},
  *     "meta": {
  *         ...
  *     },
@@ -78,8 +78,8 @@ public class MetaplusDoc extends MetaplusTemplate {
     public static MetaplusDoc copyOf(MetaplusDoc target) {
         if (null == target) throw new IllegalArgumentException("Target doc can not be null");
         MetaplusDoc newdoc = new MetaplusDoc(target.getFqmnCorp(), target.getFqmnDomain(), target.getFqmnName());
-        JsonObject cts = target.getCts();
-        if (null != cts) newdoc.setCts(cts);
+        JsonObject sync = target.getSync();
+        if (null != sync) newdoc.setSync(sync);
         JsonObject meta = target.getMeta();
         if (null != meta) newdoc.setMeta(meta);
         JsonObject plus = target.getPlus();

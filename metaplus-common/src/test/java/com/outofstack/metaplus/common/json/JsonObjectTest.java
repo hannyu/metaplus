@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JsonObjectTest {
 
@@ -143,9 +144,13 @@ class JsonObjectTest {
         System.out.println(jo7);
     }
 
+    /**
+     * ByPath
+     */
     @Test
     public void testSeven() {
-        JsonObject jo1 = JsonObject.parse("{\"num\":5,\"duck\":[\"gaga\"],\"attr\":{\"aa\":\"bb\"}}");
+        JsonObject jo1 = JsonObject.parse("{\"num\":5,\"duck\":[\"gaga\",\"dodo\"],\"attr\":{\"aa\":\"bb\"}," +
+                "\"nested\":[{},{},{\"yes\":[{},{\"no\":5}]}]}");
         assertEquals("bb", jo1.getByPath("$.attr.aa"));
         jo1.putByPath("$.x.y.z", 555);
         assertEquals(555, jo1.getByPath("$.x.y.z"));
@@ -156,8 +161,20 @@ class JsonObjectTest {
 
         jo1.putByPath("$.num", "6");
         assertEquals("6", jo1.getString("num"));
-
         System.out.println(jo1);
+
+        // array in path
+        assertEquals("dodo", jo1.getStringByPath("$.duck[1]"));
+
+        jo1.putByPath("$.duck[2]", "xixi");
+        System.out.println(jo1.toJson());
+
+        assertEquals(5, jo1.getIntegerByPath("$.nested[2].yes[1].no"));
+
+        assertThrows(Exception.class, () -> {
+            jo1.getStringByPath("$.duck[5]");
+        });
+
     }
 
     @Test
