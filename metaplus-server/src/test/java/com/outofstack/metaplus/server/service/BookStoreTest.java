@@ -28,16 +28,13 @@ public class BookStoreTest {
     private EsClient esClient;
 
     @Autowired
-    private MetaService metaService;
-
-    @Autowired
-    private DocService docService;
+    private PatchService patchService;
 
     @Autowired
     private DomainService domainService;
 
     @Autowired
-    private SearchService searchService;
+    private QueryService queryService;
 
 //    private static DomainService mDomainService;
 //
@@ -106,24 +103,24 @@ public class BookStoreTest {
                 .put("publishDate", DateUtil.formatNow())
                 .put("sth_not_exist", "Yes, i am not exist~");
         doc1.getPlus().put("desc", "说点啥呢???");
-        metaService.createMeta(doc1);
+        patchService.createMeta(doc1);
 
-        MetaplusDoc doc = docService.readDoc("::book::isbn-123-1234567");
+        MetaplusDoc doc = queryService.readDoc("::book::isbn-123-1234567");
         log.info("doc: {}", doc);
         assertEquals(5555, doc.getIntegerByPath("$.meta.pageCount"));
 
         // update book
         MetaplusDoc doc2 = new MetaplusDoc("::book::isbn-123-1234567");
         doc2.getMeta().put("pageCount", 6666);
-        metaService.updateMeta(doc2);
+        patchService.updateMeta(doc2);
 
-        doc = docService.readDoc("::book::isbn-123-1234567");
+        doc = queryService.readDoc("::book::isbn-123-1234567");
         log.info("doc: {}", doc);
         assertEquals(6666, doc.getIntegerByPath("$.meta.pageCount"));
 
         // delete book
-        metaService.deleteMeta(doc2);
-        boolean isExist = metaService.existMeta(new MetaplusDoc("::book::isbn-123-1234567"));
+        patchService.deleteMeta(doc2);
+        boolean isExist = patchService.existMeta(new MetaplusDoc("::book::isbn-123-1234567"));
         assertFalse(isExist);
     }
 
@@ -183,22 +180,22 @@ public class BookStoreTest {
                     .put("isbn", isbn)
                     .put("title", books[i])
                     .put("pageCount", rand.nextInt(1000));
-            metaService.createMeta(book);
+            patchService.createMeta(book);
         }
 
         // wait ES build index
         Thread.sleep(1000);
 
         // simple search
-        Hits hits = searchService.simpleSearch("book", "偏见");
+        Hits hits = queryService.simpleSearch("book", "偏见");
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
 
-        hits = searchService.simpleSearch("*", "moby");
+        hits = queryService.simpleSearch("*", "moby");
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
 
-        hits = searchService.simpleSearch("", "人 +-局外");
+        hits = queryService.simpleSearch("", "人 +-局外");
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
     }

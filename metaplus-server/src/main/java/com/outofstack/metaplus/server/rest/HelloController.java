@@ -13,14 +13,14 @@ public class HelloController {
 
     private final AtomicLong counter = new AtomicLong(10000);
 
-    @GetMapping("/hello")
+    @GetMapping({"/", "/hello"})
     public HttpResponse<JsonObject> hello(@RequestParam(value="name", defaultValue="buddy") String name) {
         return new HttpResponse<JsonObject>(200,
                 new JsonObject("say", "(" + counter.incrementAndGet() + ") Hey " + name + ", is everything okay?"));
     }
 
 
-    @PostMapping({"/echo/{name}", "/echo"})
+    @PostMapping({"/hello/echo/{name}", "/echo"})
     public HttpResponse<JsonObject> echo(@PathVariable(name = "name", required = false) String name,
                                          @RequestBody JsonObject requestBody) {
         return new HttpResponse<JsonObject>(200,

@@ -5,6 +5,7 @@ import com.outofstack.metaplus.common.json.JsonObject;
 public class MetaplusPatch extends MetaplusDoc {
 
     public final static String KEY_METHOD = "method";
+    public final static String KEY_PATCH = "patch";
 
     public MetaplusPatch(PatchMethod method, String fqmn) {
         super(fqmn);
@@ -14,6 +15,12 @@ public class MetaplusPatch extends MetaplusDoc {
     public MetaplusPatch(PatchMethod method, String corp, String domain, String name) {
         super(corp, domain, name);
         setMethod(method);
+    }
+
+    public MetaplusPatch(PatchMethod method, MetaplusDoc doc) {
+        super(doc);
+        setMethod(method);
+        checkAndLoad();
     }
 
     public MetaplusPatch(JsonObject target) {
@@ -40,6 +47,13 @@ public class MetaplusPatch extends MetaplusDoc {
             throw new IllegalArgumentException("PatchMethod is null");
         }
         put(KEY_METHOD, patchMethod.methodName());
+    }
+
+    public JsonObject getPatch() {
+        return getJsonObject(KEY_PATCH);
+    }
+    public void setPatch(JsonObject patch) {
+        put(KEY_PATCH, patch);
     }
 
 }

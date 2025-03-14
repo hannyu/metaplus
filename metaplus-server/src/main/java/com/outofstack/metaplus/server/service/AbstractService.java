@@ -13,6 +13,7 @@ import com.outofstack.metaplus.server.dao.SearchDao;
 import com.outofstack.metaplus.server.domain.DomainLib;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractService {
@@ -32,14 +33,14 @@ public abstract class AbstractService {
 
     void validateDoc(MetaplusDoc doc) {
         if (null == doc) {
-            throw new IllegalArgumentException("Doc is null");
+            throw new IllegalArgumentException("Doc is null.");
         }
         validateDomain(doc.getFqmnDomain());
     }
 
     void validateFqmn(String fqmn) {
-        if (null == fqmn) {
-            throw new IllegalArgumentException("Fqmn is null");
+        if (null == fqmn || fqmn.isEmpty()) {
+            throw new IllegalArgumentException("Fqmn is empty.");
         }
         String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         validateDomain(ss[1]);
@@ -48,8 +49,22 @@ public abstract class AbstractService {
     void validateDomain(String domain) {
         DomainDoc domainDoc = domainLib.getDomainDoc(domain);
         if (null == domainDoc) {
-            throw new IllegalArgumentException("Domain '" + domain + "' does not exist");
+            throw new IllegalArgumentException("Domain '" + domain + "' does not exist.");
         }
+    }
+
+    List<String> validateDomainsAnd2List(String domains) {
+        if (null == domains || domains.isEmpty()) {
+            throw new IllegalArgumentException("Domains is empty.");
+        }
+        if (domains.equals("*")) {
+            return domainLib.listCustomDomains();
+        }
+        List<String> domainList = Arrays.asList(domains.split(","));
+        for (String domain : domainList) {
+            validateDomain(domain);
+        }
+        return domainList;
     }
 
     void validatePrivilege() {

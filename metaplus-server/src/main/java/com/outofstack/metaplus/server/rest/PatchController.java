@@ -3,20 +3,20 @@ package com.outofstack.metaplus.server.rest;
 import com.outofstack.metaplus.common.http.HttpResponse;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
-import com.outofstack.metaplus.server.service.MetaService;
+import com.outofstack.metaplus.server.service.PatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/meta")
+@RequestMapping("/patch")
 @RestController
-public class MetaController {
+public class PatchController {
 
     @Autowired
-    private MetaService metaService;
+    private PatchService patchService;
 
-    @PutMapping("/create/{fqmn}")
-    public HttpResponse<JsonObject> create(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
+    @PutMapping("/create_meta/{fqmn}")
+    public HttpResponse<JsonObject> createMeta(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
         MetaplusDoc doc = new MetaplusDoc(requestBody);
         if (null != fqmn && !fqmn.isEmpty()) {
             if (!doc.getFqmn().equals(fqmn)) {
@@ -24,12 +24,12 @@ public class MetaController {
                         doc.getFqmn() + "' in doc.");
             }
         }
-        metaService.createMeta(doc);
+        patchService.createMeta(doc);
         return HttpResponse.ok();
     }
 
-    @PostMapping("/update/{fqmn}")
-    public HttpResponse<JsonObject> update(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
+    @PostMapping("/update_meta/{fqmn}")
+    public HttpResponse<JsonObject> updateMeta(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
         MetaplusDoc doc = new MetaplusDoc(requestBody);
         if (null != fqmn && !fqmn.isEmpty()) {
             if (!doc.getFqmn().equals(fqmn)) {
@@ -37,12 +37,12 @@ public class MetaController {
                         doc.getFqmn() + "' in doc.");
             }
         }
-        metaService.updateMeta(doc);
+        patchService.updateMeta(doc);
         return HttpResponse.ok();
     }
 
-    @DeleteMapping("/delete/{fqmn}")
-    public HttpResponse<JsonObject> delete(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
+    @DeleteMapping("/delete_meta/{fqmn}")
+    public HttpResponse<JsonObject> deleteMeta(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
         MetaplusDoc doc = new MetaplusDoc(requestBody);
         if (null != fqmn && !fqmn.isEmpty()) {
             if (!doc.getFqmn().equals(fqmn)) {
@@ -50,18 +50,21 @@ public class MetaController {
                         doc.getFqmn() + "' in doc.");
             }
         }
-        metaService.deleteMeta(doc);
+        patchService.deleteMeta(doc);
         return HttpResponse.ok();
     }
 
-    @RequestMapping("/exist/{fqmn}")
-    public ResponseEntity<HttpResponse<JsonObject>> exist(@PathVariable String fqmn) {
-        MetaplusDoc doc = new MetaplusDoc(fqmn);
-        if (metaService.existMeta(doc)) {
-            return ResponseEntity.ok().body(HttpResponse.ok());
-        } else {
-            return ResponseEntity.status(404).body(HttpResponse.notFound());
+    @PostMapping("/update_plus/{fqmn}")
+    public HttpResponse<JsonObject> updatePlus(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
+        MetaplusDoc doc = new MetaplusDoc(requestBody);
+        if (null != fqmn && !fqmn.isEmpty()) {
+            if (!doc.getFqmn().equals(fqmn)) {
+                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
+                        doc.getFqmn() + "' in doc.");
+            }
         }
+        patchService.updatePlus(doc);
+        return HttpResponse.ok();
     }
 
 }

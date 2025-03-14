@@ -2,7 +2,6 @@ package com.outofstack.metaplus.server.service;
 
 import com.outofstack.metaplus.common.model.MetaplusPatch;
 import com.outofstack.metaplus.common.model.PatchMethod;
-import com.outofstack.metaplus.server.MetaplusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +9,7 @@ import org.springframework.stereotype.Component;
 public class SyncService {
 
     @Autowired
-    private MetaService metaService;
-
-    @Autowired
-    private PlusService plusService;
+    private PatchService patchService;
 
 
     public void syncOne(MetaplusPatch patch) {
@@ -23,13 +19,13 @@ public class SyncService {
         // 2 dispatch
         PatchMethod method = patch.getMethod();
         if (method == PatchMethod.META_CREATE) {
-            metaService.createMeta(patch);
+            patchService.createMeta(patch);
         } else if (method == PatchMethod.META_UPDATE) {
-            metaService.updateMeta(patch);
+            patchService.updateMeta(patch);
         } else if (method == PatchMethod.META_DELETE) {
-            metaService.deleteMeta(patch);
+            patchService.deleteMeta(patch);
         } else if (method == PatchMethod.PLUS_UPDATE) {
-            plusService.updatePlus(patch);
+            patchService.updatePlus(patch);
         } else {
             throw new IllegalArgumentException("Unsupported PatchMethod '" + method + "'");
         }

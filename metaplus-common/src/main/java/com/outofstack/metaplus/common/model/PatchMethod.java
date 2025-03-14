@@ -9,7 +9,9 @@ public enum PatchMethod {
     META_CREATE("meta_create"),
     META_UPDATE("meta_update"),
     META_DELETE("meta_delete"),
-    PLUS_UPDATE("plus_update");
+    PLUS_UPDATE("plus_update"),
+    PATCH_RENAME("patch_rename"),
+    PATCH_SCRIPT("patch_script");
 
     private final String method;
     private PatchMethod(String method) {
