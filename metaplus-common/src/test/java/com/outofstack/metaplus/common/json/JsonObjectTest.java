@@ -190,7 +190,11 @@ class JsonObjectTest {
 //        });
     }
 
-    public static class MyObject extends JsonObject {}
+    public static class MyObject extends JsonObject {
+        public MyObject(JsonObject target) {
+            super(target);
+        }
+    }
     @Test
     public void testTen() {
         // generics

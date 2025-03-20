@@ -7,8 +7,7 @@ import java.nio.file.Paths;
 
 public class FileConsumerTest {
 
-    @Test
-    public void testOne() throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         FileConsumer consumer = new FileConsumer(Paths.get("/tmp/metaplus/test.log"),
                 Paths.get("/tmp/metaplus/test.log.pos"));
         consumer.start((line) -> {

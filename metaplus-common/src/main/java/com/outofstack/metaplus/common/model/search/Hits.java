@@ -42,6 +42,7 @@ public class Hits extends JsonObject {
             throw new IllegalArgumentException("A SearchHits has null item at idx '" + idx + "'");
         } else {
             MetaplusDoc doc = new MetaplusDoc(item.getJsonObject("_source"));
+            doc.internalSetId(item.getString("_id"));
             doc.setSyncVersion(item.getInteger("_version"));
             return doc;
         }

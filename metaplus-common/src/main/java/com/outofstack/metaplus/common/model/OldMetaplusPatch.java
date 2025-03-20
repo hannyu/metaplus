@@ -130,7 +130,7 @@ public class OldMetaplusPatch extends MetaplusDoc {
     public void transformPatchBody2DocBody() {
         JsonObject patchBody = getPatchBody();
         if ( !patchBody.isEmpty()) {
-            JsonObject docBody = DocUtil.transformPatchBody2DocBody(patchBody);
+            JsonObject docBody = ModelUtil.transformPatchBody2DocBody(patchBody);
             if (PatchType.META_PATCH == getPatchType()) {
                 getMeta().merge(docBody);
             } else {

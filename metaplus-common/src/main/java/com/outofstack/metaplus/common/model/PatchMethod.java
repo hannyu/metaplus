@@ -11,7 +11,7 @@ public enum PatchMethod {
     META_DELETE("meta_delete"),
     PLUS_UPDATE("plus_update"),
     PATCH_RENAME("patch_rename"),
-    PATCH_SCRIPT("patch_script");
+    PATCH_UPDATE("patch_update");
 
     private final String method;
     private PatchMethod(String method) {

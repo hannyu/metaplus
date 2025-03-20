@@ -3,12 +3,15 @@ package com.outofstack.metaplus.common.model.schema;
 
 import com.outofstack.metaplus.common.json.JsonObject;
 
+
 public class Field extends JsonObject {
     public static final String KEY_TYPE = "type";
     public static final String KEY_REQUIRED = "#required";
     public static final String KEY_DEFAULT = "#default";
     public static final String KEY_COMMENT = "#comment";
     public static final String KEY_SAMPLES = "#samples";
+    public static final String KEY_EXPRESSION = "#expression";
+    public static final String KEY_EXPRESSION_ORDER = "#expressionOrder";
 
 //    public static final String TYPE_KEYWORD = "keyword";
 //    public static final String TYPE_TEXT = "text";
@@ -67,10 +70,13 @@ public class Field extends JsonObject {
 
     public Field toPureCopy() {
         Field pureCopy = new Field(deepCopy());
-        pureCopy.remove(KEY_COMMENT);
-        pureCopy.remove(KEY_REQUIRED);
-        pureCopy.remove(KEY_DEFAULT);
-        pureCopy.remove(KEY_SAMPLES);
+//        pureCopy.remove(KEY_COMMENT);
+//        pureCopy.remove(KEY_REQUIRED);
+//        pureCopy.remove(KEY_DEFAULT);
+//        pureCopy.remove(KEY_SAMPLES);
+        for (String key : pureCopy.keySet()) {
+            if (key.startsWith("#")) pureCopy.remove(key);
+        }
         return pureCopy;
     }
 
@@ -80,8 +86,12 @@ public class Field extends JsonObject {
     public void setType(String type) {
         put(KEY_TYPE, type);
         if ("text".equals(type)) {
-            put("fields", new JsonObject("keyword",
-                    new JsonObject().put("type", "keyword").put("ignore_above", 256)));
+            put("fields", new JsonObject()
+                    .put("keyword", new JsonObject()
+                            .put("type", "keyword")
+                            .put("ignore_above", 256)
+                    )
+            );
         }
     }
     public String getComment() {
@@ -101,5 +111,18 @@ public class Field extends JsonObject {
     }
     public void setDefault(Object defaultValue) {
         put(KEY_DEFAULT, defaultValue);
+    }
+    public String getExpression() {
+        return getString(KEY_EXPRESSION);
+    }
+    public void setExpression(String expression) {
+        put(KEY_EXPRESSION, expression);
+    }
+    public int getExpressionOrder() {
+        Integer order = getInteger(KEY_EXPRESSION_ORDER);
+        return order == null ? 10 : order;
+    }
+    public void setExpressionOrder(int expressionOrder) {
+        put(KEY_EXPRESSION_ORDER, expressionOrder);
     }
 }

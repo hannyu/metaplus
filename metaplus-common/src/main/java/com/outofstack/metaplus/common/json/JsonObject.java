@@ -39,9 +39,9 @@ public class JsonObject {
     public <T extends JsonObject> T cast(Class<T> clazz) {
         try {
             Constructor<T> constructor = clazz.getConstructor(JsonObject.class);
-            T newobj = constructor.newInstance(this);
-            newobj.jop = jop;
-            return newobj;
+            T newObj = constructor.newInstance(this);
+            newObj.jop = jop;
+            return newObj;
         } catch (Throwable e) {
             throw new JsonException("Cast 'JsonObject' to '" + clazz.getSimpleName() + "' fail", e);
         }

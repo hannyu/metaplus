@@ -3,7 +3,7 @@ package com.outofstack.metaplus.common.model;
 import com.outofstack.metaplus.common.json.JsonObject;
 
 
-public class DocUtil {
+public class ModelUtil {
 
     /**
      * metaplus::meta::none --> metaplus, meta, none
@@ -31,8 +31,8 @@ public class DocUtil {
      * @param name
      * @return
      */
-    public static String combineFqmn(String corp, String domain, String name) {
-        return corp + "::" + domain + "::" + name;
+    public static String packFqmn(String corp, String domain, String name) {
+        return (corp == null ? "" : corp) + "::" + domain + "::" + name;
     }
 
 
