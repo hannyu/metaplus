@@ -118,7 +118,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> syncOne(MetaplusPatch patch) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/sync/one/%s".formatted(patch.getFqmnDomain()))
+                .uri("/sync/one/%s".formatted(patch.getDomain()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(patch)
