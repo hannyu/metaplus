@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.outofstack.metaplus"
@@ -22,4 +23,10 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs(['-XX:+EnableDynamicAgentLoading', '-Xshare:off'])
+}
+
+shadowJar {
+    archiveClassifier.set('all') // 可选：为生成的 JAR 文件添加分类器（例如 `-all`）
+    mergeServiceFiles() // 合并服务文件（如果需要）
 }

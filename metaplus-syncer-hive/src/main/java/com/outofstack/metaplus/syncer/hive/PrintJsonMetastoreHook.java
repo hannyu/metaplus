@@ -1,5 +1,6 @@
 package com.outofstack.metaplus.syncer.hive;
 
+import com.outofstack.metaplus.common.PropertyConfig;
 import com.outofstack.metaplus.common.file.DailyRollingLogger;
 import com.outofstack.metaplus.common.json.JsonObject;
 import org.apache.hadoop.conf.Configuration;
@@ -12,22 +13,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.Iterator;
 
-public class PrintJsonHook extends MetaStoreEventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(PrintJsonHook.class);
+public class PrintJsonMetastoreHook extends MetaStoreEventListener {
+    private static final Logger log = LoggerFactory.getLogger(PrintJsonMetastoreHook.class);
+
 
     private DailyRollingLogger patchlog = null;
-    public PrintJsonHook(Configuration config) {
+    public PrintJsonMetastoreHook(Configuration config) {
         super(config);
+
         try {
-            patchlog = new DailyRollingLogger("");
+            String logname = PropertyConfig.get(PropertyConfig.KEY_SYNCER_METASTORE_PATCHLOG_NAME,
+                    "print_json.log");
+            patchlog = new DailyRollingLogger(Paths.get(PropertyConfig.getSyncerDir(), logname));
         } catch (IOException e) {
             log.error("Metaplus: Init patchlog fail.", e);
         }
-
     }
 
     private void printLog(String msg) {
