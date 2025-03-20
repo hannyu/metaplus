@@ -13,19 +13,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class SearchDao {
+public class SearchDao extends AbstractDao {
 
-    @Autowired
-    private EsClient esClient;
-
-    @Autowired
-    private DomainLib domainLib;
-
-//    public Hits query(String domain, Query query) {
-//        List<String> domains = new ArrayList<String>(1);
-//        domains.add(domain);
-//        return query(domains, query);
-//    }
 
     public Hits query(List<String> domains, Query query) {
         List<String> indexNames = batchDomain2IndexName(domains);

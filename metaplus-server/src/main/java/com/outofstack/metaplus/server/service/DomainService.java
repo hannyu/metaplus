@@ -18,7 +18,7 @@ import java.util.Set;
 public class DomainService extends AbstractService{
 
     @Autowired
-    private PatchService patchService;
+    private MetaService metaService;
 
     public void createDomain(DomainDoc domainDoc) {
         // 1 validate param
@@ -34,6 +34,7 @@ public class DomainService extends AbstractService{
         // 3. build
         String indexName = DomainLib.PREFIX_INDEX + domainDoc.getFqmnName();
         domainDoc.putByPath("$.meta.index.name", indexName);
+        validateAndFixupByRules(domainDoc);
         SchemaTuple schemaTuple = domainLib.generateSchemaTuple(domainDoc);
 
         // 4. create index
@@ -45,7 +46,7 @@ public class DomainService extends AbstractService{
 
         // 5. create doc
         domainDoc.setSchema(schemaTuple.getRichSchema());
-        patchService.createMeta(domainDoc);
+        metaService.create(domainDoc);
         domainLib.putDomainDoc(name, domainDoc);
     }
 
@@ -80,7 +81,7 @@ public class DomainService extends AbstractService{
         }
 
         // 4. doc
-        patchService.updateMeta(oldDoc);
+        metaService.update(oldDoc);
         domainLib.putDomainDoc(name, oldDoc);
     }
 
@@ -100,7 +101,7 @@ public class DomainService extends AbstractService{
         }
 
         // 3. doc
-        patchService.deleteMeta(domainDoc);
+        metaService.delete(domainDoc);
         domainLib.removeDomain(domain);
     }
 

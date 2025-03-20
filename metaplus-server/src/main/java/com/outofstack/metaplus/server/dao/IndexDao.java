@@ -11,11 +11,7 @@ import org.springframework.stereotype.Component;
  * 索引的CRUD基本操作，将来可扩展到其他性能、观察等API
  */
 @Component
-public class IndexDao {
-
-
-    @Autowired
-    private EsClient esClient;
+public class IndexDao extends AbstractDao {
 
     /**
      * if the index exist or not

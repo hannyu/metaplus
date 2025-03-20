@@ -1,6 +1,7 @@
 package com.outofstack.metaplus.server.service;
 
 import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.*;
 import com.outofstack.metaplus.common.model.schema.Field;
 import com.outofstack.metaplus.common.model.schema.Properties;
@@ -28,6 +29,9 @@ public class BookStoreTest {
     private EsClient esClient;
 
     @Autowired
+    private MetaService metaService;
+
+    @Autowired
     private PatchService patchService;
 
     @Autowired
@@ -44,7 +48,7 @@ public class BookStoreTest {
 //    }
 
     @BeforeAll
-    public static void initBookStore(@Autowired DomainService domainService) {
+    public static void initBookStore(@Autowired DomainService domainService) throws InterruptedException {
         log.info("initBookStore: {}", domainService.listDomains());
 
         if (domainService.existDomain("book")) {
@@ -58,6 +62,7 @@ public class BookStoreTest {
 
         Properties authors = new Properties();
         authors.putProperty("nationality", new Field("keyword"));
+        authors.putProperty("fullname", new Field("keyword"));
         meta.putProperty("authors", authors);
 
         meta.putProperty("language", new Field("keyword"));
@@ -70,6 +75,13 @@ public class BookStoreTest {
 
         Properties mappings = new Properties();
         mappings.putProperty("meta", meta);
+
+        // express
+        Properties fqmn = new Properties();
+        Field name = new Field("keyword");
+        name.setExpression("'isbn-'+meta.cat+'-'+meta.isbn");
+        fqmn.putProperty("name", name);
+        mappings.putProperty("fqmn", fqmn);
 
         DomainDoc domainDoc = new DomainDoc("book");
         domainDoc.getSchema().setMappings(mappings);
@@ -87,40 +99,51 @@ public class BookStoreTest {
     }
 
     @Test
-    public void testOne() {
+    public void testOne() throws InterruptedException {
         /// CRUD doc
 
         // exist
         assertTrue(domainService.existDomain("book"));
 
         // create book
-        MetaplusDoc doc1 = new MetaplusDoc("::book::isbn-123-1234567");
+        MetaplusDoc doc1 = new MetaplusDoc("::book::isbn--123");
         doc1.getMeta()
-                .put("isbn", "123-1234567")
+                .put("cat", "")
+                .put("isbn", "1234567")     // not 123
                 .put("title", "钢铁是怎样练成的")
                 .put("pageCount", 5555)
                 .put("isPublished", true)
                 .put("publishDate", DateUtil.formatNow())
                 .put("sth_not_exist", "Yes, i am not exist~");
         doc1.getPlus().put("desc", "说点啥呢???");
-        patchService.createMeta(doc1);
+        metaService.create(doc1);
 
-        MetaplusDoc doc = queryService.readDoc("::book::isbn-123-1234567");
+//        // FIXME: need refresh
+//        Thread.sleep(1000);
+
+        MetaplusDoc doc = queryService.readDoc("::book::isbn--123");
         log.info("doc: {}", doc);
         assertEquals(5555, doc.getIntegerByPath("$.meta.pageCount"));
 
         // update book
-        MetaplusDoc doc2 = new MetaplusDoc("::book::isbn-123-1234567");
+        MetaplusDoc doc2 = new MetaplusDoc("::book::isbn--123");
         doc2.getMeta().put("pageCount", 6666);
-        patchService.updateMeta(doc2);
+        metaService.update(doc2);
 
-        doc = queryService.readDoc("::book::isbn-123-1234567");
+//        // FIXME: need refresh
+//        Thread.sleep(1000);
+
+        doc = queryService.readDoc("::book::isbn--1234567");
         log.info("doc: {}", doc);
         assertEquals(6666, doc.getIntegerByPath("$.meta.pageCount"));
 
         // delete book
-        patchService.deleteMeta(doc2);
-        boolean isExist = patchService.existMeta(new MetaplusDoc("::book::isbn-123-1234567"));
+        metaService.delete(doc);
+
+//        // FIXME: need refresh
+//        Thread.sleep(1000);
+
+        boolean isExist = metaService.exist("::book::isbn--1234567");
         assertFalse(isExist);
     }
 
@@ -180,11 +203,11 @@ public class BookStoreTest {
                     .put("isbn", isbn)
                     .put("title", books[i])
                     .put("pageCount", rand.nextInt(1000));
-            patchService.createMeta(book);
+            metaService.create(book);
         }
 
-        // wait ES build index
-        Thread.sleep(1000);
+//        // wait ES build index
+//        Thread.sleep(1000);
 
         // simple search
         Hits hits = queryService.simpleSearch("book", "偏见");
@@ -195,11 +218,115 @@ public class BookStoreTest {
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
 
-        hits = queryService.simpleSearch("", "人 +-局外");
+        hits = queryService.simpleSearch("book", "人 +-局外");
         System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
     }
 
 
+    @Test
+    public void testFive() throws InterruptedException {
+        /// patch_rename
 
+        // create book
+        MetaplusDoc doc1 = new MetaplusDoc("::book::isbn-777-99998888");
+        doc1.getMeta()
+                .put("isbn", "777-99998888")
+                .put("title", "钢铁是怎样练成的")
+                .put("pageCount", 5555)
+                .put("isPublished", true)
+                .put("publishDate", DateUtil.formatNow())
+                .put("sth_not_exist", "Yes, i am not exist~");
+        doc1.getPlus().put("desc", "说点啥呢???");
+        metaService.create(doc1);
+
+        MetaplusDoc doc2 = new MetaplusDoc("::book::isbn-777-99998888");
+        MetaplusPatch patch = new MetaplusPatch(PatchMethod.PATCH_RENAME, doc2);
+        doc2.getMeta().put("isbn", "777-77777777");
+        patch.setPatch(new JsonObject("rename", new JsonObject("fqmn", new JsonObject("name", "isbn-777-77777777"))));
+        patchService.rename(patch);
+
+        assertFalse(metaService.exist("::book::isbn-777-99998888"));
+        assertTrue(metaService.exist("::book::isbn-777-77777777"));
+
+        doc2 = queryService.readDoc("::book::isbn-777-77777777");
+        assertEquals("777-77777777", doc2.getMeta().getString("isbn"));
+    }
+
+
+    @Test
+    public void testSix() throws InterruptedException {
+        /// patch_update
+
+        // create book
+        MetaplusDoc doc1 = new MetaplusDoc("::book::isbn-111-111");
+        doc1.getMeta()
+                .put("cat", "111")
+                .put("isbn", "111")
+                .put("title", "钢铁是怎样练成的")
+                .put("pageCount", 5555);
+        doc1.getPlus().put("desc", "说点啥呢???");
+        metaService.create(doc1);
+
+        doc1 = new MetaplusDoc("::book::isbn-111-222");
+        doc1.getMeta()
+                .put("cat", "111")
+                .put("isbn", "222")
+                .put("title", "钢铁是怎样练成的")
+                .put("pageCount", 5555);
+        metaService.create(doc1);
+
+        doc1 = new MetaplusDoc("::book::isbn-333-33333333");
+        doc1.getMeta()
+                .put("cat", "333")
+                .put("isbn", "333")
+                .put("title", "变色龙")
+                .put("pageCount", 6666);
+        metaService.create(doc1);
+
+        MetaplusPatch patch = new MetaplusPatch(PatchMethod.PATCH_UPDATE, "book");
+        JsonObject patchJo =
+                new JsonObject("query",
+                        new JsonObject("term",
+                                new JsonObject("meta.cat", "111")))
+                .put("script", new JsonObject()
+                        .put("source", "")
+                        .put("params", new JsonObject()
+                                .put("meta", new JsonObject("cat", "333"))
+                                .put("sync", new JsonObject("updatedBy", "你爷爷"))));
+        patch.setPatch(patchJo);
+        patchService.updateByQuery(patch);
+
+        MetaplusDoc doc3 = queryService.readDoc("::book::isbn-333-222");
+        System.out.println("doc3: " + doc3);
+        assertEquals("333", doc3.getMeta().getString("cat"));
+    }
+
+
+    @Test
+    public void testSeven() throws InterruptedException {
+        /// expression
+
+        // create book
+        MetaplusDoc doc1 = new MetaplusDoc("::book::isbn-111-111");
+        doc1.getMeta()
+                .put("cat", "111")
+                .put("isbn", "111")
+                .put("title", "钢铁是怎样练成的")
+                .put("pageCount", 5555);
+        doc1.getPlus().put("desc", "说点啥呢???");
+        metaService.create(doc1);
+
+        MetaplusDoc doc2 = new MetaplusDoc("::book::isbn-111-111");
+        doc2.getMeta().put("cat", "222");
+        metaService.update(doc2);
+
+
+        assertFalse(metaService.exist("::book::isbn-111-111"));
+        assertTrue(metaService.exist("::book::isbn-222-111"));
+
+        MetaplusDoc doc3 = queryService.readDoc("::book::isbn-222-111");
+        System.out.println("doc3: " + doc3);
+        assertEquals("222", doc3.getMeta().getString("cat"));
+    }
 }

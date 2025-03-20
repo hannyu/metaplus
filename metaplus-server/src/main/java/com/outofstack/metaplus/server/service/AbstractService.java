@@ -3,7 +3,7 @@ package com.outofstack.metaplus.server.service;
 import com.outofstack.metaplus.common.DateUtil;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.json.JsonRule;
-import com.outofstack.metaplus.common.model.DocUtil;
+import com.outofstack.metaplus.common.model.ModelUtil;
 import com.outofstack.metaplus.common.model.DomainDoc;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.server.MetaplusException;
@@ -42,7 +42,7 @@ public abstract class AbstractService {
         if (null == fqmn || fqmn.isEmpty()) {
             throw new IllegalArgumentException("Fqmn is empty.");
         }
-        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
         validateDomain(ss[1]);
     }
 
@@ -71,44 +71,30 @@ public abstract class AbstractService {
         // TODO
     }
 
-    void fixupSyncCreated(MetaplusDoc doc) {
-        String createdAt = doc.getSyncCreatedAt();
-        String newCreatedAt;
-        if (null == createdAt || createdAt.isEmpty()) {
-            newCreatedAt = DateUtil.formatNow();
+    String fixupAt(String at) {
+        if (null == at || at.isEmpty()) {
+            return  DateUtil.formatNow();
         } else {
             try {
-                newCreatedAt = DateUtil.epochMilli2Formatted(Long.parseLong(createdAt));
+                return DateUtil.epochMilli2Formatted(Long.parseLong(at));
             } catch (RuntimeException e) {
                 try {
-                    newCreatedAt = DateUtil.format(DateUtil.tryParse(createdAt));
+                    return DateUtil.format(DateUtil.tryParse(at));
                 } catch (RuntimeException e2) {
-                    newCreatedAt = DateUtil.formatNow();
+                    return DateUtil.formatNow();
                 }
             }
         }
-        doc.setSyncCreatedAt(newCreatedAt);
+    }
+
+    void fixupSyncCreated(MetaplusDoc doc) {
+        doc.setSyncCreatedAt(fixupAt(doc.getSyncCreatedAt()));
         doc.deleteSyncUpdatedBy();
         doc.deleteSyncUpdatedAt();
     }
 
     void fixupSyncUpdated(MetaplusDoc doc) {
-        String updatedAt = doc.getSyncUpdatedAt();
-        String newUpdatedAt;
-        if (null == updatedAt || updatedAt.isEmpty()) {
-            newUpdatedAt = DateUtil.formatNow();
-        } else {
-            try {
-                newUpdatedAt = DateUtil.epochMilli2Formatted(Long.parseLong(updatedAt));
-            } catch (RuntimeException e) {
-                try {
-                    newUpdatedAt = DateUtil.format(DateUtil.tryParse(updatedAt));
-                } catch (RuntimeException e2) {
-                    newUpdatedAt = DateUtil.formatNow();
-                }
-            }
-        }
-        doc.setSyncUpdatedAt(newUpdatedAt);
+        doc.setSyncUpdatedAt(fixupAt(doc.getSyncUpdatedAt()));
         doc.deleteSyncCreatedBy();
         doc.deleteSyncCreatedAt();
     }

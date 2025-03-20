@@ -18,9 +18,9 @@ public class SyncController {
     public HttpResponse<JsonObject> one(@PathVariable(name = "domain", required = false) String domain,
                                         @RequestBody JsonObject requestBody) {
         MetaplusPatch patch = new MetaplusPatch(requestBody);
-        if (null != domain && !domain.isEmpty() && !domain.equals(patch.getFqmnDomain())) {
+        if (null != domain && !domain.isEmpty() && !domain.equals(patch.getDomain())) {
             throw new IllegalArgumentException("Domain '" + domain + "' in path is NOT equal to domain '" +
-                    patch.getFqmnDomain() + "' in patch.");
+                    patch.getDomain() + "' in patch.");
         }
         syncService.syncOne(patch);
         return HttpResponse.ok();

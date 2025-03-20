@@ -28,4 +28,9 @@ public class EsResponse extends JsonObject {
         int code = getInteger(KEY_STATUS_CODE);
         return code >= 200 && code < 300;
     }
+
+    public boolean isNotFound() {
+        int code = getInteger(KEY_STATUS_CODE);
+        return code == 404;
+    }
 }

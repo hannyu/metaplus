@@ -15,56 +15,5 @@ public class PatchController {
     @Autowired
     private PatchService patchService;
 
-    @PutMapping("/create_meta/{fqmn}")
-    public HttpResponse<JsonObject> createMeta(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
-        MetaplusDoc doc = new MetaplusDoc(requestBody);
-        if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
-                        doc.getFqmn() + "' in doc.");
-            }
-        }
-        patchService.createMeta(doc);
-        return HttpResponse.ok();
-    }
-
-    @PostMapping("/update_meta/{fqmn}")
-    public HttpResponse<JsonObject> updateMeta(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
-        MetaplusDoc doc = new MetaplusDoc(requestBody);
-        if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
-                        doc.getFqmn() + "' in doc.");
-            }
-        }
-        patchService.updateMeta(doc);
-        return HttpResponse.ok();
-    }
-
-    @DeleteMapping("/delete_meta/{fqmn}")
-    public HttpResponse<JsonObject> deleteMeta(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
-        MetaplusDoc doc = new MetaplusDoc(requestBody);
-        if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
-                        doc.getFqmn() + "' in doc.");
-            }
-        }
-        patchService.deleteMeta(doc);
-        return HttpResponse.ok();
-    }
-
-    @PostMapping("/update_plus/{fqmn}")
-    public HttpResponse<JsonObject> updatePlus(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
-        MetaplusDoc doc = new MetaplusDoc(requestBody);
-        if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
-                        doc.getFqmn() + "' in doc.");
-            }
-        }
-        patchService.updatePlus(doc);
-        return HttpResponse.ok();
-    }
 
 }

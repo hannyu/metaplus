@@ -21,6 +21,9 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain" -H 'Content-Type: application/j
     "properties": {
       "fqmn": {
         "properties": {
+          "fqmn": {
+            "type": "keyword"
+          },
           "corp": {
             "type": "keyword"
           },
@@ -29,6 +32,10 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain" -H 'Content-Type: application/j
           },
           "name": {
             "type": "keyword"
+          },
+          "_id": {
+            "type": "alias",
+            "path": "_id"
           }
         }
       },
@@ -52,7 +59,7 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain" -H 'Content-Type: application/j
           "updatedFrom": {
             "type": "keyword"
           },
-          "version": {
+          "_version": {
             "type": "alias",
             "path": "_version"
           }
@@ -107,11 +114,14 @@ fi
 # import meta of none
 echo ""
 echo ""
-echo "=== Init metaplus::domain::none"
-curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::none" -H 'Content-Type: application/json' -d '
+echo "=== Init ::domain::none"
+#curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::none" -H 'Content-Type: application/json' -d '
+curl -XPOST "${ES_BASE_URL}/i_metaplus_of_domain/_doc/" -H 'Content-Type: application/json' -d '
+
 {
   "fqmn": {
-    "corp": "metaplus",
+    "fqmn": "::domain::none",
+    "corp": "",
     "domain": "domain",
     "name": "none"
   },
@@ -132,6 +142,11 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::none" 
         "properties": {
           "fqmn": {
             "properties": {
+              "fqmn": {
+                "type": "keyword",
+                "#expression": "fqmn.corp+\"::\"+fqmn.domain+\"::\"+fqmn.name",
+                "#expressionOrder": 100
+              },
               "corp": {
                 "type": "keyword"
               },
@@ -151,7 +166,7 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::none" 
               },
               "createdAt": {
                 "type": "date",
-                "#comment": "Date format is yyyy-MM-dd'"'T'"'HH:mm:ss.SSSZ, like 2025-01-15T18:39:47.082+0800"
+                "#comment": "Date format is yyyy-MM-dd'"'T'"'HH:mm:ss.SSSZ"
               },
               "createdFrom": {
                 "type": "keyword",
@@ -189,18 +204,20 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::none" 
 # Get doc metaplus::domain::none
 echo ""
 echo ""
-echo "=== Get metaplus::domain::none"
-curl -XGET "${ES_BASE_URL}/i_metaplus_of_domain/_doc/metaplus::domain::none" -H 'Content-Type: application/json'
+echo "=== Get ::domain::none"
+curl -XGET "${ES_BASE_URL}/i_metaplus_of_domain/_search" -H 'Content-Type: application/json'
 
 
 # import domain of domain
 echo ""
 echo ""
-echo "=== Init metaplus::domain::domain"
-curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::domain" -H 'Content-Type: application/json' -d '
+echo "=== Init ::domain::domain"
+#curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/::domain::domain" -H 'Content-Type: application/json' -d '
+curl -XPOST "${ES_BASE_URL}/i_metaplus_of_domain/_doc/" -H 'Content-Type: application/json' -d '
 {
   "fqmn": {
-    "corp": "metaplus",
+    "fqmn": "::domain::domain",
+    "corp": "",
     "domain": "domain",
     "name": "domain"
   },
@@ -268,8 +285,7 @@ curl -XPUT "${ES_BASE_URL}/i_metaplus_of_domain/_create/metaplus::domain::domain
           }
         }
       },
-      "settings": {
-      }
+      "settings": {}
     }
   }
 }

@@ -19,16 +19,6 @@ public class QueryController {
     @Autowired
     private QueryService queryService;
 
-    @RequestMapping("/exist_doc/{fqmn}")
-    public ResponseEntity<HttpResponse<JsonObject>> existDoc(@PathVariable String fqmn) {
-        MetaplusDoc doc = new MetaplusDoc(fqmn);
-        if (queryService.existDoc(doc)) {
-            return ResponseEntity.ok().body(HttpResponse.ok());
-        } else {
-            return ResponseEntity.status(404).body(HttpResponse.notFound());
-        }
-    }
-
     @GetMapping("/read_doc/{fqmn}")
     public HttpResponse<MetaplusDoc> readDoc(@PathVariable String fqmn) {
         MetaplusDoc doc = queryService.readDoc(fqmn);

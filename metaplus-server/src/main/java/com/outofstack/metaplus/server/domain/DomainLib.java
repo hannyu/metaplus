@@ -22,8 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DomainLib {
     public static final String PREFIX_INDEX =  "i_metaplus_of_";
-    public static final String CORP_METAPLUS =  "metaplus";
-
     public static final String DOMAIN_NONE =  "none";
     public static final String DOMAIN_DOMAIN =  "domain";
     public static final String DOMAIN_TRASH =  "trash";
@@ -53,25 +51,24 @@ public class DomainLib {
     }
 
     public DomainDoc getDomainDoc(String domain) {
-//        initDomainCache();
         return domainCache.get(domain);
     }
 
     public void putDomainDoc(String domain, DomainDoc domainDoc) {
-//        initDomainCache();
         domainCache.put(domain, domainDoc);
-        rulesCache.remove(domain);
+        domainRules.remove(domain);
+        domainExpressions.remove(domain);
     }
 
     public boolean existDomain(String domain) {
-//        initDomainCache();
         return DOMAIN_DOMAIN.equals(domain) || domainCache.containsKey(domain);
     }
 
     public void removeDomain(String domain) {
 //        initDomainCache();
         domainCache.remove(domain);
-        rulesCache.remove(domain);
+        domainRules.remove(domain);
+        domainExpressions.remove(domain);
     }
 
     public String getIndexName(String domain) {
@@ -126,7 +123,8 @@ public class DomainLib {
     /// Schema here
     /// ///////////////////////////////////////////
 
-    private final Map<String, List<JsonRule>> rulesCache = new ConcurrentHashMap<>();
+    private final Map<String, List<JsonRule>> domainRules = new ConcurrentHashMap<>();
+    private final Map<String, String> domainExpressions = new ConcurrentHashMap<>();;
 
 //    private volatile Map<String, SchemaTuple> schemaTuples = new ConcurrentHashMap<>();
 
@@ -147,17 +145,45 @@ public class DomainLib {
 //        return schemaTuples.get(domain).richSchema;
 //    }
 
-    public List<JsonRule> getRules(String domain) {
-        if (rulesCache.containsKey(domain)) {
-            return rulesCache.get(domain);
-        } else if (existDomain(domain)){
-            DomainDoc domainDoc = getDomainDoc(domain);
-            List<JsonRule> rules = buildJsonRules(domainDoc.getSchema().getMappings());
-            rulesCache.put(domain, rules);
-            return  rules;
-        } else {
+    private void buildRulesAndExpressions(String domain) {
+        if (!existDomain(domain)){
             throw new MetaplusException("Domain '" + domain + "' does not exist");
         }
+        DomainDoc domainDoc = getDomainDoc(domain);
+        List<JsonRule> rules = new ArrayList<>();
+        List<Map.Entry<Integer, String>> expressions = new ArrayList<>();
+
+        buildJsonRulesRecursively("$", domainDoc.getSchema().getMappings(), rules, expressions);
+        domainRules.put(domain, rules);
+        domainExpressions.put(domain, packExpressions(expressions));
+    }
+
+    public List<JsonRule> getRules(String domain) {
+        if (!domainRules.containsKey(domain)) {
+            buildRulesAndExpressions(domain);
+        }
+        return domainRules.get(domain);
+    }
+
+    public String getExpressions(String domain) {
+        if (!domainExpressions.containsKey(domain)) {
+            buildRulesAndExpressions(domain);
+        }
+        return domainExpressions.get(domain);
+    }
+
+    private String packExpressions(List<Map.Entry<Integer, String>> expressions) {
+        expressions.sort(new Comparator<Map.Entry<Integer, String>>() {
+            @Override
+            public int compare(Map.Entry<Integer, String> o1, Map.Entry<Integer, String> o2) {
+                return o2.getKey().compareTo(o1.getKey()) * -1;
+            }
+        });
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<Integer, String> entry : expressions) {
+            sb.append(" ").append(entry.getValue());
+        }
+        return sb.toString();
     }
 
 //    public Schema getPureSchema(String domain) {
@@ -267,18 +293,15 @@ public class DomainLib {
         return pureProperties;
     }
 
-    public List<JsonRule> buildJsonRules(Properties mappings) {
-        List<JsonRule> jsonRules = new ArrayList<>();
-        buildJsonRulesRecursively(jsonRules, "$", mappings);
-        return jsonRules;
-    }
 
-    private void buildJsonRulesRecursively(List<JsonRule> rules, String jsonPath, Properties properties) {
+    private void buildJsonRulesRecursively(String jsonPath, Properties properties, List<JsonRule> rules,
+                                           List<Map.Entry<Integer, String>> expressions) {
         for (String key : properties.propertyKeySet()) {
             JsonObject property = properties.getProperty(key);
             if (Properties.isProperties(property)) {
-                buildJsonRulesRecursively(rules, jsonPath + "." + key, new Properties(property));
+                buildJsonRulesRecursively(jsonPath + "." + key, new Properties(property), rules, expressions);
             } else if (Field.isField(property)) {
+                // add rule
                 Field field = new Field(property);
                 String sComment = field.getComment();
                 Boolean bRequired = field.getRequired();
@@ -286,6 +309,13 @@ public class DomainLib {
                 if ( (null != sComment && !sComment.isEmpty()) || (null != bRequired && !bRequired) ||
                         (null != oDefault)) {
                     rules.add(new JsonRule(jsonPath + "." + key, sComment, bRequired, oDefault));
+                }
+
+                // add expression
+                String expression = field.getExpression();
+                if (null != expression && !expression.isEmpty()) {
+                    expression = jsonPath.substring(2) + "." + key + " = " + expression + ";";
+                    expressions.add(Map.entry(field.getExpressionOrder(), expression));
                 }
             } else {
                 throw new IllegalArgumentException("Invalid property '" + property + "' with key '" + key + "'");

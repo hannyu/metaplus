@@ -10,6 +10,10 @@ public class SyncService {
 
     @Autowired
     private PatchService patchService;
+    @Autowired
+    private MetaService metaService;
+    @Autowired
+    private PlusService plusService;
 
 
     public void syncOne(MetaplusPatch patch) {
@@ -19,13 +23,17 @@ public class SyncService {
         // 2 dispatch
         PatchMethod method = patch.getMethod();
         if (method == PatchMethod.META_CREATE) {
-            patchService.createMeta(patch);
+            metaService.create(patch.getDoc());
         } else if (method == PatchMethod.META_UPDATE) {
-            patchService.updateMeta(patch);
+            metaService.update(patch.getDoc());
         } else if (method == PatchMethod.META_DELETE) {
-            patchService.deleteMeta(patch);
+            metaService.delete(patch.getDoc());
         } else if (method == PatchMethod.PLUS_UPDATE) {
-            patchService.updatePlus(patch);
+            plusService.update(patch.getDoc());
+        } else if (method == PatchMethod.PATCH_RENAME) {
+            patchService.rename(patch);
+        } else if (method == PatchMethod.PATCH_UPDATE) {
+            patchService.updateByQuery(patch);
         } else {
             throw new IllegalArgumentException("Unsupported PatchMethod '" + method + "'");
         }
