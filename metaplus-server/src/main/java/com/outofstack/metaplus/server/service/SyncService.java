@@ -33,7 +33,9 @@ public class SyncService {
         } else if (method == PatchMethod.PATCH_RENAME) {
             patchService.rename(patch);
         } else if (method == PatchMethod.PATCH_UPDATE) {
-            patchService.updateByQuery(patch);
+            patchService.update(patch);
+        } else if (method == PatchMethod.PATCH_SCRIPT) {
+            patchService.script(patch);
         } else {
             throw new IllegalArgumentException("Unsupported PatchMethod '" + method + "'");
         }

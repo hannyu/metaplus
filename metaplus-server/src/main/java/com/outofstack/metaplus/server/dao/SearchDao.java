@@ -4,10 +4,7 @@ import com.outofstack.metaplus.common.StringUtil;
 import com.outofstack.metaplus.common.model.search.Hits;
 import com.outofstack.metaplus.common.model.search.Query;
 import com.outofstack.metaplus.server.MetaplusException;
-import com.outofstack.metaplus.server.domain.DomainLib;
-import com.outofstack.metaplus.server.storage.EsClient;
 import com.outofstack.metaplus.server.storage.EsResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

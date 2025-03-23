@@ -10,7 +10,7 @@ import com.outofstack.metaplus.server.MetaplusException;
 import com.outofstack.metaplus.server.dao.DocDao;
 import com.outofstack.metaplus.server.dao.IndexDao;
 import com.outofstack.metaplus.server.dao.SearchDao;
-import com.outofstack.metaplus.server.domain.DomainLib;
+import com.outofstack.metaplus.server.dao.DomainLib;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;

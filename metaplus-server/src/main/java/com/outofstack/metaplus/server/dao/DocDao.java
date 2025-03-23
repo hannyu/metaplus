@@ -85,7 +85,7 @@ public class DocDao extends AbstractDao {
 
         Query query = new Query();
         query.setQuery(new JsonObject("term", new JsonObject("fqmn.fqmn", fqmn)));
-        query.setScript(new JsonObject("source", " ctx.op = 'delete'"));
+        query.setScript(new JsonObject("source", "ctx.op = 'delete';"));
 
         EsResponse response = esClient.post(url, query);
         if (!response.isSuccess()) {

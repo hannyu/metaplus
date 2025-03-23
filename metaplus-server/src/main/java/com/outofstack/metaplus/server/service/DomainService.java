@@ -6,9 +6,9 @@ import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.common.model.schema.Properties;
 import com.outofstack.metaplus.common.model.schema.Schema;
 import com.outofstack.metaplus.server.MetaplusException;
-import com.outofstack.metaplus.server.domain.DomainLib;
+import com.outofstack.metaplus.server.dao.DomainLib;
 
-import com.outofstack.metaplus.server.domain.SchemaTuple;
+import com.outofstack.metaplus.server.dao.SchemaTuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

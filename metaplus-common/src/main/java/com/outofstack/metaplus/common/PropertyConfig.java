@@ -45,17 +45,9 @@ public class PropertyConfig {
     /// //////////////////////
 
 
+
+    /// dir
     public static final String KEY_SYNCER_DIR = "metaplus.syncer.dir";
-
-    public static final String KEY_SYNCER_METASTORE_PATCHLOG_NAME = "metaplus.syncer.metastore_patchlog_name";
-    public static final String DEFAULT_SYNCER_METASTORE_PATCHLOG_NAME = "metaplus-metastore.patchlog";
-
-    public static final String KEY_SYNCER_FQMN_CORP = "metaplus.syncer.fqmn.corp";
-    public static final String DEFAULT_SYNCER_FQMN_CORP = "";
-
-    public static final String KEY_SYNCER_HOSTNAME = "metaplus.syncer.hostname";
-
-    /// //////////////////////
 
     private static String syncerDir = null;
     public static String getSyncerDir() {
@@ -69,6 +61,10 @@ public class PropertyConfig {
         return syncerDir;
     }
 
+    /// fqmn.corp
+    public static final String KEY_SYNCER_FQMN_CORP = "metaplus.syncer.fqmn.corp";
+    public static final String DEFAULT_SYNCER_FQMN_CORP = "";
+
     private static String fqmnCorp = null;
     public static String getFqmnCorp() {
         if (null == fqmnCorp) {
@@ -76,6 +72,9 @@ public class PropertyConfig {
         }
         return fqmnCorp;
     }
+
+    /// hostname
+    public static final String KEY_SYNCER_HOSTNAME = "metaplus.syncer.hostname";
 
     private static String syncerHostname = null;
     public static String getSyncerHostname() {

@@ -1,4 +1,4 @@
-package com.outofstack.metaplus.server.domain;
+package com.outofstack.metaplus.server.dao;
 
 import com.outofstack.metaplus.common.DateUtil;
 import com.outofstack.metaplus.common.json.JsonArray;

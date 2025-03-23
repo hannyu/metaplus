@@ -4,6 +4,7 @@ import com.outofstack.metaplus.common.json.JsonRule;
 import com.outofstack.metaplus.common.model.DomainDoc;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.server.MetaplusServerAppTest;
+import com.outofstack.metaplus.server.dao.DomainLib;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

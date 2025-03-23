@@ -50,6 +50,11 @@ public class PatchService extends AbstractService{
 //    }
 
 
+    /**
+     * When rename FQMN directly, use 'patch_rename'.
+     * When rename FQMN by Expression, just use 'meta_update'.
+     *
+     */
     public void rename(MetaplusPatch patch) {
         // 1 validate param
         validateDomain(patch.getDomain());
@@ -71,9 +76,7 @@ public class PatchService extends AbstractService{
         docDao.rename(patch);
     }
 
-
-
-    public void updateByQuery(MetaplusPatch patch) {
+    private void updateByQuery(MetaplusPatch patch, String source) {
         // 1 validate param
         validateDomain(patch.getDomain());
 
@@ -86,14 +89,26 @@ public class PatchService extends AbstractService{
         }
         Query query = new Query(patch.getPatch());
         JsonObject script = query.getScript();
-//        if (null == script.getString("source")) {
-//            throw new MetaplusException("Patch must have 'patch.script.source'.");
-//        }
+        script.put("source", (null == source ? "" : source));
+
         String updateAt = script.getStringByPath("$.params.sync.updatedAt");
         script.putByPath("$.params.sync.updatedAt", fixupAt(updateAt));
 
         // 4 update_by_query
         docDao.updateByQuery(patch);
     }
+
+    public void update(MetaplusPatch patch) {
+        updateByQuery(patch, "");
+    }
+
+    public void delete(MetaplusPatch patch) {
+        updateByQuery(patch, "ctx.op = 'delete';");
+    }
+
+    public void script(MetaplusPatch patch) {
+        updateByQuery(patch, patch.getString("$.patch.script.source"));
+    }
+
 
 }

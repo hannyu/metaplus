@@ -1,6 +1,5 @@
 package com.outofstack.metaplus.server.dao;
 
-import com.outofstack.metaplus.server.domain.DomainLib;
 import com.outofstack.metaplus.server.storage.EsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 

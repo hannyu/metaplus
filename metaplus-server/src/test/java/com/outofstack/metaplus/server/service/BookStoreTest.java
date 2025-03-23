@@ -290,12 +290,11 @@ public class BookStoreTest {
                         new JsonObject("term",
                                 new JsonObject("meta.cat", "111")))
                 .put("script", new JsonObject()
-                        .put("source", "")
                         .put("params", new JsonObject()
                                 .put("meta", new JsonObject("cat", "333"))
                                 .put("sync", new JsonObject("updatedBy", "你爷爷"))));
         patch.setPatch(patchJo);
-        patchService.updateByQuery(patch);
+        patchService.update(patch);
 
         MetaplusDoc doc3 = queryService.readDoc("::book::isbn-333-222");
         System.out.println("doc3: " + doc3);

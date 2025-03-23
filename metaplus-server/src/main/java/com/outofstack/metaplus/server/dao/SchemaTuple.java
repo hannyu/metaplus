@@ -1,4 +1,4 @@
-package com.outofstack.metaplus.server.domain;
+package com.outofstack.metaplus.server.dao;
 
 import com.outofstack.metaplus.common.model.schema.Schema;
 
