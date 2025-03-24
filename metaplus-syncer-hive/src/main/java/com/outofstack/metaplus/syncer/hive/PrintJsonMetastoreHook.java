@@ -27,8 +27,7 @@ public class PrintJsonMetastoreHook extends MetaStoreEventListener {
         super(config);
 
         try {
-            String logname = PropertyConfig.get(PropertyConfig.KEY_SYNCER_METASTORE_PATCHLOG_NAME,
-                    "print_json.log");
+            String logname = "print_json.log";
             patchlog = new DailyRollingLogger(Paths.get(PropertyConfig.getSyncerDir(), logname));
         } catch (IOException e) {
             log.error("Metaplus: Init patchlog fail.", e);
@@ -42,7 +41,6 @@ public class PrintJsonMetastoreHook extends MetaStoreEventListener {
         } catch (IOException e) {
             log.error("Metaplus: Write line fail.", e);
         }
-
     }
 
     @Override
