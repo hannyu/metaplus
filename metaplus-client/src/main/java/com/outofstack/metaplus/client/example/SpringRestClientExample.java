@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-public class UseSpringRestClientExample {
+public class SpringRestClientExample {
 
     public static void main(String[] args) {
 

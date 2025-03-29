@@ -1,6 +1,7 @@
 package com.outofstack.metaplus.client;
 
 import com.outofstack.metaplus.common.http.HttpResponse;
+import com.outofstack.metaplus.common.http.JsonObjectMessageConverter;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.DomainDoc;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 public class MetaplusClient {
@@ -18,6 +20,20 @@ public class MetaplusClient {
 
     public MetaplusClient(RestClient restClient) {
         this.restClient = restClient;
+    }
+
+    public MetaplusClient(String baseUrl) {
+        this.restClient = RestClient.builder()
+                .requestFactory(new HttpComponentsClientHttpRequestFactory())
+                .messageConverters(converters -> {
+                    converters.add(0, new JsonObjectMessageConverter());
+                })
+                .baseUrl(baseUrl)
+                .build();
+    }
+
+    public RestClient getRestClient() {
+        return restClient;
     }
 
     /// ///////////////////////
@@ -56,7 +72,7 @@ public class MetaplusClient {
     }
 
     /// ///////////////////////
-    /// meta, plus, sync
+    /// meta, plus, patch
     /// ///////////////////////
 
     public HttpResponse<JsonObject> metaCreate(String fqmn, MetaplusDoc doc) {
@@ -83,18 +99,6 @@ public class MetaplusClient {
         return new HttpResponse<JsonObject>(response.getBody(), JsonObject.class);
     }
 
-    public HttpResponse<JsonObject> plusUpdate(String fqmn, MetaplusDoc doc) {
-        ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/plus/update/%s".formatted(fqmn))
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(doc)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
-                .toEntity(JsonObject.class);
-        return new HttpResponse<JsonObject>(response.getBody(), JsonObject.class);
-    }
-
     public HttpResponse<JsonObject> metaDelete(String fqmn, MetaplusDoc doc) {
         ResponseEntity<JsonObject> response = restClient.method(HttpMethod.DELETE)
                 .uri("/meta/delete/%s".formatted(fqmn))
@@ -107,14 +111,46 @@ public class MetaplusClient {
         return new HttpResponse<JsonObject>(response.getBody(), JsonObject.class);
     }
 
-    public HttpResponse<JsonObject> metaExist(String fqmn) {
-        ResponseEntity<JsonObject> response = restClient.head()
-                .uri("/meta/exist/%s".formatted(fqmn))
+    public HttpResponse<JsonObject> plusUpdate(String fqmn, MetaplusDoc doc) {
+        ResponseEntity<JsonObject> response = restClient.post()
+                .uri("/plus/update/%s".formatted(fqmn))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(doc)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
                 .toEntity(JsonObject.class);
         return new HttpResponse<JsonObject>(response.getBody(), JsonObject.class);
     }
+
+    public HttpResponse<JsonObject> patchUpdate(String domain, MetaplusPatch patch) {
+        ResponseEntity<JsonObject> response = restClient.post()
+                .uri("/patch/update/%s".formatted(domain))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(patch)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
+                .toEntity(JsonObject.class);
+        return new HttpResponse<JsonObject>(response.getBody(), JsonObject.class);
+    }
+
+    public HttpResponse<JsonObject> patchDelete(String domain, MetaplusPatch patch) {
+        ResponseEntity<JsonObject> response = restClient.post()
+                .uri("/patch/delete/%s".formatted(domain))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(patch)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
+                .toEntity(JsonObject.class);
+        return new HttpResponse<JsonObject>(response.getBody(), JsonObject.class);
+    }
+
+
+    /// ///////////////////////
+    /// sync
+    /// ///////////////////////
 
     public HttpResponse<JsonObject> syncOne(MetaplusPatch patch) {
         ResponseEntity<JsonObject> response = restClient.post()
@@ -129,23 +165,31 @@ public class MetaplusClient {
     }
 
     /// ///////////////////////
-    /// doc, search
+    /// query
     /// ///////////////////////
 
-    public HttpResponse<MetaplusDoc> docRead(String fqmn) {
+    public HttpResponse<JsonObject> queryExist(String fqmn) {
+        ResponseEntity<JsonObject> response = restClient.head()
+                .uri("/query/exist/%s".formatted(fqmn))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
+                .toEntity(JsonObject.class);
+        return new HttpResponse<JsonObject>(response.getBody(), JsonObject.class);
+    }
+
+    public HttpResponse<MetaplusDoc> queryRead(String fqmn) {
         ResponseEntity<JsonObject> response = restClient.get()
-                .uri("/doc/read/%s".formatted(fqmn))
+                .uri("/query/read/%s".formatted(fqmn))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
                 .toEntity(JsonObject.class);
-        System.out.println("body: " + response.getBody());
         return new HttpResponse<MetaplusDoc>(response.getBody(), MetaplusDoc.class);
     }
 
-    public HttpResponse<Hits> searchSimple(String domains, String queryText) {
+    public HttpResponse<Hits> querySimpleSearch(String domains, String queryText) {
         ResponseEntity<JsonObject> response = restClient.get()
-                .uri("/search/simple/%s/%s".formatted(domains, queryText))
+                .uri("/query/simple_search/%s/%s".formatted(domains, queryText))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})

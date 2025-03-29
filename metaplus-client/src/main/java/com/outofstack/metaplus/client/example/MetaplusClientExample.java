@@ -9,7 +9,7 @@ import com.outofstack.metaplus.common.model.search.Hits;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-public class UseMetaplusClientExample {
+public class MetaplusClientExample {
 
     public static void main(String[] args) {
 
@@ -20,31 +20,34 @@ public class UseMetaplusClientExample {
                 })
                 .baseUrl("http://localhost:8020/")
                 .build();
-        MetaplusClient mpClient = new MetaplusClient(restClient);
+        MetaplusClient mpclient = new MetaplusClient(restClient);
+        /// or simply
+        /// MetaplusClient mpClient = new MetaplusClient("http://localhost:8020/");
+
 
         /// /hello
-        HttpResponse<JsonObject> response1 = mpClient.hello();
+        HttpResponse<JsonObject> response1 = mpclient.hello();
         System.out.println("hello res: " + response1);
 
         /// /wrong
-        response1 = mpClient.wrong();
+        response1 = mpclient.wrong();
         System.out.println("wrong res: " + response1);
 
         /// /echo
-        response1 = mpClient.echo("Jerry", new JsonObject("Tom", "is here"));
+        response1 = mpclient.echo("Jerry", new JsonObject("Tom", "is here"));
         System.out.println("echo res: " + response1);
 
         /// /domain/list
-        HttpResponse<JsonObject> response2 = mpClient.domainList();
+        HttpResponse<JsonObject> response2 = mpclient.domainList();
         System.out.println("domainList res: " + response2);
 
-        /// /doc/read
-        HttpResponse<MetaplusDoc> response3 = mpClient.docRead("metaplus::domain::none");
-        System.out.println("docRead res: " + response3);
+        /// /query/read
+        HttpResponse<MetaplusDoc> response3 = mpclient.queryRead("metaplus::domain::none");
+        System.out.println("queryRead res: " + response3);
 
-        /// /search/simple
-        HttpResponse<Hits> response4 = mpClient.searchSimple("*", "2025");
-        System.out.println("searchSimple res: " + response4);
+        /// /query/simple_search
+        HttpResponse<Hits> response4 = mpclient.querySimpleSearch("*", "2025");
+        System.out.println("querySimpleSearch res: " + response4);
 
     }
 }
