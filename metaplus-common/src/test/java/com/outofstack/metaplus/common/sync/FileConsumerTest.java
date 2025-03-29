@@ -9,7 +9,7 @@ public class FileConsumerTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         FileConsumer consumer = new FileConsumer(Paths.get("/tmp/metaplus/test.log"),
-                Paths.get("/tmp/metaplus/test.log.pos"));
+                Paths.get("/tmp/metaplus/test.log.readpos"));
         consumer.start((line) -> {
             System.out.println("line: " + line);
         });

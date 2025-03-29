@@ -75,6 +75,17 @@ public class HttpResponse<BodyType extends JsonObject> extends JsonObject {
         put(KEY_BODY, body);
     }
 
+
+    public boolean isSuccess() {
+        int code = getInteger(KEY_CODE);
+        return code >= 200 && code < 300;
+    }
+
+    public boolean isNotFound() {
+        int code = getInteger(KEY_CODE);
+        return code == 404;
+    }
+
     /// ////////////////////////////////
     /// common final http response
     /// ////////////////////////////////

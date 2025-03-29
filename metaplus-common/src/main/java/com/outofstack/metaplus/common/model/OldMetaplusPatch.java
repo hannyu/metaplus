@@ -124,21 +124,21 @@ public class OldMetaplusPatch extends MetaplusDoc {
         }
     }
 
-    /**
-     * TODO: It is not elegant
-     */
-    public void transformPatchBody2DocBody() {
-        JsonObject patchBody = getPatchBody();
-        if ( !patchBody.isEmpty()) {
-            JsonObject docBody = ModelUtil.transformPatchBody2DocBody(patchBody);
-            if (PatchType.META_PATCH == getPatchType()) {
-                getMeta().merge(docBody);
-            } else {
-                getPlus().merge(docBody);
-            }
-            clearPatchBody();
-        }
-
-    }
+//    /**
+//     * TODO: It is not elegant
+//     */
+//    public void transformPatchBody2DocBody() {
+//        JsonObject patchBody = getPatchBody();
+//        if ( !patchBody.isEmpty()) {
+//            JsonObject docBody = DocUtil.transformPatchBody2DocBody(patchBody);
+//            if (PatchType.META_PATCH == getPatchType()) {
+//                getMeta().merge(docBody);
+//            } else {
+//                getPlus().merge(docBody);
+//            }
+//            clearPatchBody();
+//        }
+//
+//    }
 
 }

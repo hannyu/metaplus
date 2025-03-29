@@ -35,7 +35,7 @@ public abstract class MetaplusTemplate extends JsonObject {
 
     public MetaplusTemplate(String fqmn) {
         super();
-        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         setFqmn(ss[0], ss[1], ss[2]);
         checkAndLoad();
     }
@@ -110,12 +110,12 @@ public abstract class MetaplusTemplate extends JsonObject {
             }
             fqmnjo.put(KEY_FQMN_NAME, name);
         }
-        fqmnjo.put(KEY_FQMN_FQMN, ModelUtil.packFqmn(fqmnjo.getString(KEY_FQMN_CORP),
+        fqmnjo.put(KEY_FQMN_FQMN, DocUtil.packFqmn(fqmnjo.getString(KEY_FQMN_CORP),
                 fqmnjo.getString(KEY_FQMN_DOMAIN), fqmnjo.getString(KEY_FQMN_NAME)));
     }
 
     public void setFqmnFqmn(String fqmn) {
-        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         setFqmn(ss[0], ss[1], ss[2]);
     }
 

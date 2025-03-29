@@ -1,0 +1,61 @@
+{
+  "fqmn": {
+    "fqmn": "::domain::table",
+    "corp": "",
+    "domain": "domain",
+    "name": "table"
+  },
+  "meta": {
+    "index": {
+      "desc": "domain of table",
+      "abstract": false,
+      "extend": "none"
+    },
+    "schema": {
+      "mappings": {
+        "properties": {
+          "fqmn": {
+            "properties": {
+              "name": {
+                "type": "keyword",
+                "#expression": "meta.catalogName+\".\"+meta.dbName+\".\"+meta.tableName"
+              }
+            }
+          },
+          "meta": {
+            "properties": {
+              "catalogName": { "type": "keyword" },
+              "dbName": {"type": "text"},
+              "tableName": {"type": "text"},
+              "tableComment": {"type": "text"},
+              "tableType": {"type": "keyword"},
+              "tableOwner": {"type": "keyword"},
+              "tableParams": {"type": "object"},
+              "columns": {
+                "properties": {
+                  "name": {"type": "keyword"},
+                  "type": {"type": "keyword"},
+                  "comment": {"type": "text"}
+                }
+              },
+              "partitionKeys": {
+                "type": "text",
+                "#comment": "A text separated by commas. Eg: year,month,day"
+              },
+              "sd": {
+                "properties": {
+                  "location": {"type": "keyword"},
+                  "inputFormat": {"type": "keyword"},
+                  "outputFormat": {"type": "keyword"},
+                  "serdeLib": {"type": "keyword"},
+                  "compressed": {"type": "boolean"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "settings": {}
+    }
+  }
+}

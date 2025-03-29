@@ -7,6 +7,7 @@ import com.outofstack.metaplus.common.model.MetaplusPatch;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileConsumer {
 
@@ -15,10 +16,12 @@ public class FileConsumer {
     private Path logpath;
     private Path pospath;
 
+
+    public FileConsumer(Path logpath) {
+        this(logpath, logpath.getParent().resolve(logpath.getFileName() + ".readpos"));
+    }
+
     public FileConsumer(Path logpath, Path pospath) {
-//        if (!Files.isReadable(logpath)) throw new IllegalArgumentException("Can not read logpath '" + logpath + "'");
-//        if (!Files.isWritable(pospath)) throw new IllegalArgumentException("Can not write pospath '" + pospath + "'");
-//        if (null == processor) throw new IllegalArgumentException("Processor can not be null");
         this.logpath = logpath;
         this.pospath = pospath;
     }
@@ -59,13 +62,13 @@ public class FileConsumer {
                     raf.seek(lastReadPos);
                     String line = readUtf8Line(raf);
                     if (null != line) {
-                        String sl[] = line.split(",", 2);
+                        String[] sl = line.split(",", 2);
                         if (sl.length != 2) throw new RuntimeException("Read a unformatted line '" + line + "'");
                         String curDatetime = sl[0];
                         String json = sl[1];
-                        MetaplusPatch patch = new MetaplusPatch(JsonObject.parse(json));
                         if (curDatetime.compareTo(lastDatetime) >= 0) {
-                            process.doConsumer(patch);
+//                            MetaplusPatch patch = new MetaplusPatch(JsonObject.parse(json));
+                            process.doConsumer(json);
                         }
                         lastReadPos = raf.getFilePointer();
                         lastDatetime = curDatetime;

@@ -70,12 +70,16 @@ public class Field extends JsonObject {
 
     public Field toPureCopy() {
         Field pureCopy = new Field(deepCopy());
-//        pureCopy.remove(KEY_COMMENT);
-//        pureCopy.remove(KEY_REQUIRED);
-//        pureCopy.remove(KEY_DEFAULT);
-//        pureCopy.remove(KEY_SAMPLES);
         for (String key : pureCopy.keySet()) {
             if (key.startsWith("#")) pureCopy.remove(key);
+        }
+        if ("text".equals(pureCopy.getType())) {
+            pureCopy.put("fields", new JsonObject()
+                    .put("keyword", new JsonObject()
+                            .put("type", "keyword")
+                            .put("ignore_above", 256)
+                    )
+            );
         }
         return pureCopy;
     }
@@ -85,14 +89,6 @@ public class Field extends JsonObject {
     }
     public void setType(String type) {
         put(KEY_TYPE, type);
-        if ("text".equals(type)) {
-            put("fields", new JsonObject()
-                    .put("keyword", new JsonObject()
-                            .put("type", "keyword")
-                            .put("ignore_above", 256)
-                    )
-            );
-        }
     }
     public String getComment() {
         return getString(KEY_COMMENT);

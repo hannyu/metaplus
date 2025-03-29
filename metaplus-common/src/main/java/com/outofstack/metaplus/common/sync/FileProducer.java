@@ -23,10 +23,10 @@ public class FileProducer {
         }
     }
 
-    public void produce(MetaplusPatch patch) {
-        if (null != patchlog && null != patch) {
+    public void produce(String line) {
+        if (null != patchlog && null != line) {
             try {
-                patchlog.writeLine(DateUtil.formatNow(), ",", patch.toJson());
+                patchlog.writeLine(DateUtil.formatNow(), ",", line);
             } catch (IOException e) {
                 System.err.println("Metaplus: Write patchlog fail. Error: " + e.toString());
             }

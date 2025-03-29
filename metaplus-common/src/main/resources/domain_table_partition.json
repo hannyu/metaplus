@@ -1,0 +1,64 @@
+{
+  "fqmn": {
+    "fqmn": "::domain::table_partition",
+    "corp": "",
+    "domain": "domain",
+    "name": "table_partition"
+  },
+  "meta": {
+    "index": {
+      "desc": "domain of table_partition",
+      "abstract": false,
+      "extend": "none"
+    },
+    "schema": {
+      "mappings": {
+        "properties": {
+          "fqmn": {
+            "properties": {
+              "name": {
+                "type": "keyword",
+                "#expression": "meta.catalogName+\".\"+meta.dbName+\".\"+meta.tableName+\"(\"+meta.partitionValues+\")\""
+              }
+            }
+          },
+          "meta": {
+            "properties": {
+              "catalogName": {"type": "keyword"},
+              "dbName": {"type": "text"},
+              "tableName": {"type": "text"},
+              "partitionKeys": {
+                "type": "keyword",
+                "#comment": "A text separated by commas. Eg. year/month/day"
+              },
+              "partitionValues": {
+                "type": "keyword",
+                "#comment": "A text separated by commas. Eg. year=2025/month=03/day=08"
+              },
+              "sd": {
+                "properties": {
+                  "location": {"type": "keyword"},
+                  "serdeLib": {"type": "keyword"},
+                  "compressed": {"type": "boolean"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "settings": {}
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

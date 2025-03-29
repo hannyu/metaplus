@@ -1,0 +1,48 @@
+{
+  "fqmn": {
+    "fqmn": "::domain::table_column",
+    "corp": "",
+    "domain": "domain",
+    "name": "table_column"
+  },
+  "meta": {
+    "index": {
+      "desc": "domain of table_column",
+      "abstract": false,
+      "extend": "none"
+    },
+    "schema": {
+      "mappings": {
+        "properties": {
+          "fqmn": {
+            "properties": {
+              "name": {
+                "type": "keyword",
+                "#expression": "meta.catalogName+\".\"+meta.dbName+\".\"+meta.tableName+\".\"+meta.columnName"
+              }
+            }
+          },
+          "meta": {
+            "properties": {
+              "catalogName": { "type": "keyword" },
+              "dbName": {"type": "text"},
+              "tableName": {"type": "text"},
+              "columnName": {"type": "keyword"},
+              "columnType": {"type": "keyword"},
+              "columnComment": {"type": "text"}
+            }
+          }
+        }
+      },
+      "settings": {}
+    }
+  }
+}
+
+
+
+
+
+
+
+
