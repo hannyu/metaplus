@@ -19,8 +19,8 @@ public class PlusController {
     public HttpResponse<JsonObject> update(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
         MetaplusDoc doc = new MetaplusDoc(requestBody);
         if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
+            if (!doc.getFqmnFqmn().equals(fqmn)) {
+                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in url is NOT equal to fqmn '" +
                         doc.getFqmn() + "' in doc.");
             }
         }

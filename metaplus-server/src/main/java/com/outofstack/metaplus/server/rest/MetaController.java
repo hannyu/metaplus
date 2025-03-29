@@ -20,8 +20,8 @@ public class MetaController {
     public HttpResponse<JsonObject> create(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
         MetaplusDoc doc = new MetaplusDoc(requestBody);
         if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
+            if (!doc.getFqmnFqmn().equals(fqmn)) {
+                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in url is NOT equal to fqmn '" +
                         doc.getFqmn() + "' in doc.");
             }
         }
@@ -33,8 +33,8 @@ public class MetaController {
     public HttpResponse<JsonObject> update(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
         MetaplusDoc doc = new MetaplusDoc(requestBody);
         if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
+            if (!doc.getFqmnFqmn().equals(fqmn)) {
+                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in url is NOT equal to fqmn '" +
                         doc.getFqmn() + "' in doc.");
             }
         }
@@ -46,22 +46,13 @@ public class MetaController {
     public HttpResponse<JsonObject> delete(@PathVariable String fqmn, @RequestBody JsonObject requestBody) {
         MetaplusDoc doc = new MetaplusDoc(requestBody);
         if (null != fqmn && !fqmn.isEmpty()) {
-            if (!doc.getFqmn().equals(fqmn)) {
-                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in path is NOT equal to fqmn '" +
+            if (!doc.getFqmnFqmn().equals(fqmn)) {
+                throw new IllegalArgumentException("Fqmn '" + fqmn + "' in url is NOT equal to fqmn '" +
                         doc.getFqmn() + "' in doc.");
             }
         }
         metaService.delete(doc);
         return HttpResponse.ok();
-    }
-
-    @RequestMapping("/exist/{fqmn}")
-    public ResponseEntity<HttpResponse<JsonObject>> exist(@PathVariable String fqmn) {
-        if (metaService.exist(fqmn)) {
-            return ResponseEntity.ok().body(HttpResponse.ok());
-        } else {
-            return ResponseEntity.status(404).body(HttpResponse.notFound());
-        }
     }
 
 }

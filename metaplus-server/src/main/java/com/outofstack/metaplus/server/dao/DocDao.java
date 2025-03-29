@@ -67,7 +67,7 @@ public class DocDao extends AbstractDao {
 
     @Deprecated
     public void delete0(String fqmn) {
-        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         String index = domainLib.getAndCheckIndexName(ss[1]);
         String url = "/%s/_doc/%s".formatted(index, fqmn);
 
@@ -79,7 +79,7 @@ public class DocDao extends AbstractDao {
     }
 
     public void delete(String fqmn) {
-        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         String index = domainLib.getAndCheckIndexName(ss[1]);
         String url = "/%s/_update_by_query?refresh".formatted(index);
 
@@ -144,14 +144,14 @@ public class DocDao extends AbstractDao {
     }
 
     public boolean exist(String fqmn) {
-        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         return exist(ss[0], ss[1], ss[2]);
     }
 
     @Deprecated
     public boolean exist0(String corp, String domain, String name) {
         String index = domainLib.getAndCheckIndexName(domain);
-        String fqmn = ModelUtil.packFqmn(corp, domain, name);
+        String fqmn = DocUtil.packFqmn(corp, domain, name);
         String url = "/%s/_doc/%s".formatted(index, fqmn);
 
         EsResponse response = esClient.head(url);
@@ -160,7 +160,7 @@ public class DocDao extends AbstractDao {
 
     public boolean exist(String corp, String domain, String name) {
         String index = domainLib.getAndCheckIndexName(domain);
-        String fqmn = ModelUtil.packFqmn(corp, domain, name);
+        String fqmn = DocUtil.packFqmn(corp, domain, name);
         String url = "/%s/_search?size=0&terminate_after=1".formatted(index);
 
         Query query = new Query();
@@ -176,13 +176,13 @@ public class DocDao extends AbstractDao {
     }
 
     public MetaplusDoc read(String fqmn) {
-        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         return read(ss[0], ss[1], ss[2]);
     }
 
     public MetaplusDoc read(String corp, String domain, String name) {
         String index = domainLib.getAndCheckIndexName(domain);
-        String fqmn = ModelUtil.packFqmn(corp, domain, name);
+        String fqmn = DocUtil.packFqmn(corp, domain, name);
         String url = "/%s/_search?version=true".formatted(index);
 
         Query query = new Query();

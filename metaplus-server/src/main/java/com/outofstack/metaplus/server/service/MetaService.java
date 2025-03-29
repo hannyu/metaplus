@@ -56,23 +56,12 @@ public class MetaService extends AbstractService{
         validatePrivilege();
 
         // 3 build doc
-        if (!docDao.exist(doc.getFqmnFqmn())) {
-            throw new MetaplusException("Meta '" + doc.getFqmn() + "' does not exist");
-        }
+//        if (!docDao.exist(doc.getFqmnFqmn())) {
+//            throw new MetaplusException("Meta '" + doc.getFqmnFqmn() + "' does not exist");
+//        }
 
         // 4 delete doc
         docDao.delete(doc.getFqmnFqmn());
-    }
-
-    public boolean exist(String fqmn) {
-        // 1 validate param
-        validateFqmn(fqmn);
-
-        // 2 validate privilege
-        validatePrivilege();
-
-        // 3 exist doc
-        return docDao.exist(fqmn);
     }
 
 

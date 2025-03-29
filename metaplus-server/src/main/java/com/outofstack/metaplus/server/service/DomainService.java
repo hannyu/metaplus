@@ -9,6 +9,8 @@ import com.outofstack.metaplus.server.MetaplusException;
 import com.outofstack.metaplus.server.dao.DomainLib;
 
 import com.outofstack.metaplus.server.dao.SchemaTuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import java.util.Set;
 
 @Component
 public class DomainService extends AbstractService{
+
+    private static final Logger log = LoggerFactory.getLogger(DomainService.class);
 
     @Autowired
     private MetaService metaService;
@@ -94,14 +98,22 @@ public class DomainService extends AbstractService{
 
         // 2. index
         domainDoc = domainLib.getDomainDoc(domain);
+        if (null == domainDoc) {
+            throw new MetaplusException("Domain '" + domain + "' is NOT exist");
+        }
         String indexName = domainDoc.getStringByPath("$.meta.index.name");
-        Boolean isAbstract = domainDoc.getBooleanByPath("$.meta.index.abstract");
-        if (null == isAbstract || !isAbstract) {
+        try {
             indexDao.deleteIndex(indexName);
+        } catch (MetaplusException e) {
+            log.warn("Delete index '{}' fail", indexName, e);
         }
 
         // 3. doc
-        metaService.delete(domainDoc);
+        try {
+            metaService.delete(domainDoc);
+        } catch (MetaplusException e) {
+            log.warn("delete doc '{}' fail", domainDoc.getFqmnFqmn(), e);
+        }
         domainLib.removeDomain(domain);
     }
 

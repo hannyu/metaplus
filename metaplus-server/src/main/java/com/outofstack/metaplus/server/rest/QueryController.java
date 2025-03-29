@@ -19,10 +19,25 @@ public class QueryController {
     @Autowired
     private QueryService queryService;
 
-    @GetMapping("/read_doc/{fqmn}")
-    public HttpResponse<MetaplusDoc> readDoc(@PathVariable String fqmn) {
-        MetaplusDoc doc = queryService.readDoc(fqmn);
-        return new HttpResponse<MetaplusDoc>(200, doc);
+
+    @RequestMapping("/exist/{fqmn}")
+    public ResponseEntity<HttpResponse<JsonObject>> exist(@PathVariable String fqmn) {
+        if (queryService.exist(fqmn)) {
+            return ResponseEntity.ok().body(HttpResponse.ok());
+        } else {
+            // because 'notFound' can not have body
+            return ResponseEntity.status(404).body(HttpResponse.notFound());
+        }
+    }
+
+    @GetMapping("/read/{fqmn}")
+    public ResponseEntity<HttpResponse<JsonObject>> read(@PathVariable String fqmn) {
+        MetaplusDoc doc = queryService.read(fqmn);
+        if (null == doc) {
+            return ResponseEntity.status(404).body(HttpResponse.notFound());
+        } else {
+            return ResponseEntity.ok().body(new HttpResponse<JsonObject>(200, doc));
+        }
     }
 
     @GetMapping("/simple_search/{domains}/{queryText}")

@@ -121,7 +121,7 @@ public class BookStoreTest {
 //        // FIXME: need refresh
 //        Thread.sleep(1000);
 
-        MetaplusDoc doc = queryService.readDoc("::book::isbn--123");
+        MetaplusDoc doc = queryService.read("::book::isbn--123");
         log.info("doc: {}", doc);
         assertEquals(5555, doc.getIntegerByPath("$.meta.pageCount"));
 
@@ -133,7 +133,7 @@ public class BookStoreTest {
 //        // FIXME: need refresh
 //        Thread.sleep(1000);
 
-        doc = queryService.readDoc("::book::isbn--1234567");
+        doc = queryService.read("::book::isbn--1234567");
         log.info("doc: {}", doc);
         assertEquals(6666, doc.getIntegerByPath("$.meta.pageCount"));
 
@@ -143,7 +143,7 @@ public class BookStoreTest {
 //        // FIXME: need refresh
 //        Thread.sleep(1000);
 
-        boolean isExist = metaService.exist("::book::isbn--1234567");
+        boolean isExist = queryService.exist("::book::isbn--1234567");
         assertFalse(isExist);
     }
 
@@ -246,10 +246,10 @@ public class BookStoreTest {
         patch.setPatch(new JsonObject("rename", new JsonObject("fqmn", new JsonObject("name", "isbn-777-77777777"))));
         patchService.rename(patch);
 
-        assertFalse(metaService.exist("::book::isbn-777-99998888"));
-        assertTrue(metaService.exist("::book::isbn-777-77777777"));
+        assertFalse(queryService.exist("::book::isbn-777-99998888"));
+        assertTrue(queryService.exist("::book::isbn-777-77777777"));
 
-        doc2 = queryService.readDoc("::book::isbn-777-77777777");
+        doc2 = queryService.read("::book::isbn-777-77777777");
         assertEquals("777-77777777", doc2.getMeta().getString("isbn"));
     }
 
@@ -296,7 +296,7 @@ public class BookStoreTest {
         patch.setPatch(patchJo);
         patchService.update(patch);
 
-        MetaplusDoc doc3 = queryService.readDoc("::book::isbn-333-222");
+        MetaplusDoc doc3 = queryService.read("::book::isbn-333-222");
         System.out.println("doc3: " + doc3);
         assertEquals("333", doc3.getMeta().getString("cat"));
     }
@@ -321,10 +321,10 @@ public class BookStoreTest {
         metaService.update(doc2);
 
 
-        assertFalse(metaService.exist("::book::isbn-111-111"));
-        assertTrue(metaService.exist("::book::isbn-222-111"));
+        assertFalse(queryService.exist("::book::isbn-111-111"));
+        assertTrue(queryService.exist("::book::isbn-222-111"));
 
-        MetaplusDoc doc3 = queryService.readDoc("::book::isbn-222-111");
+        MetaplusDoc doc3 = queryService.read("::book::isbn-222-111");
         System.out.println("doc3: " + doc3);
         assertEquals("222", doc3.getMeta().getString("cat"));
     }

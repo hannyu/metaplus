@@ -13,8 +13,19 @@ import java.util.List;
 public class QueryService extends AbstractService {
 
 
+    public boolean exist(String fqmn) {
+        // 1 validate param
+        validateFqmn(fqmn);
 
-    public MetaplusDoc readDoc(String fqmn) {
+        // 2 validate privilege
+        validatePrivilege();
+
+        // 3 exist doc
+        return docDao.exist(fqmn);
+    }
+
+
+    public MetaplusDoc read(String fqmn) {
         // 1 validate param
         validateFqmn(fqmn);
         // 2 validate privilege

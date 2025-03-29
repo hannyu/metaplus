@@ -3,7 +3,7 @@ package com.outofstack.metaplus.server.service;
 import com.outofstack.metaplus.common.DateUtil;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.json.JsonRule;
-import com.outofstack.metaplus.common.model.ModelUtil;
+import com.outofstack.metaplus.common.model.DocUtil;
 import com.outofstack.metaplus.common.model.DomainDoc;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.server.MetaplusException;
@@ -42,7 +42,7 @@ public abstract class AbstractService {
         if (null == fqmn || fqmn.isEmpty()) {
             throw new IllegalArgumentException("Fqmn is empty.");
         }
-        String[] ss = ModelUtil.checkAndSplitFqmn(fqmn);
+        String[] ss = DocUtil.checkAndSplitFqmn(fqmn);
         validateDomain(ss[1]);
     }
 

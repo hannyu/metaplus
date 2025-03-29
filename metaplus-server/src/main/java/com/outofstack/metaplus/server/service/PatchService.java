@@ -53,8 +53,9 @@ public class PatchService extends AbstractService{
     /**
      * When rename FQMN directly, use 'patch_rename'.
      * When rename FQMN by Expression, just use 'meta_update'.
-     *
+     * FIXME: deprecate
      */
+    @Deprecated
     public void rename(MetaplusPatch patch) {
         // 1 validate param
         validateDomain(patch.getDomain());

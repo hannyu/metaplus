@@ -23,7 +23,7 @@ public class DomainController {
     public HttpResponse<JsonObject> create(@PathVariable String domain, @RequestBody JsonObject requestBody) {
         DomainDoc doc = new DomainDoc(requestBody);
         if (!doc.getFqmnName().equals(domain)) {
-            throw new IllegalArgumentException("domain '" + domain + "' in path is NOT equal to domain '" +
+            throw new IllegalArgumentException("domain '" + domain + "' in url is NOT equal to domain '" +
                     doc.getFqmnName() + "' in doc.");
         }
         domainService.createDomain(doc);
@@ -34,7 +34,7 @@ public class DomainController {
     public HttpResponse<JsonObject> update(@PathVariable String domain, @RequestBody JsonObject requestBody) {
         DomainDoc doc = new DomainDoc(requestBody);
         if (!doc.getFqmnName().equals(domain)) {
-            throw new IllegalArgumentException("domain '" + domain + "' in path is NOT equal to domain '" +
+            throw new IllegalArgumentException("domain '" + domain + "' in url is NOT equal to domain '" +
                     doc.getFqmnName() + "' in doc.");
         }
         domainService.updateDomain(doc);
@@ -45,7 +45,7 @@ public class DomainController {
     public HttpResponse<JsonObject> delete(@PathVariable String domain, @RequestBody JsonObject requestBody) {
         DomainDoc doc = new DomainDoc(requestBody);
         if (!doc.getFqmnName().equals(domain)) {
-            throw new IllegalArgumentException("domain '" + domain + "' in path is NOT equal to domain '" +
+            throw new IllegalArgumentException("domain '" + domain + "' in url is NOT equal to domain '" +
                     doc.getFqmnName() + "' in doc.");
         }
         domainService.deleteDomain(doc);
