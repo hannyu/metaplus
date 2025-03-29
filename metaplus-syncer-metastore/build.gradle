@@ -1,0 +1,109 @@
+plugins {
+    id("java")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("application")
+}
+
+group = "com.outofstack.metaplus"
+version = "$metaplus_version"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":metaplus-common"))
+    implementation(project(":metaplus-client"))
+
+    compileOnly 'org.apache.hive:hive-standalone-metastore-server:4.0.1'
+    implementation 'org.apache.hive:hive-metastore:4.0.1'
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
+    implementation("org.springframework:spring-web:$springweb_version")
+    implementation("org.apache.httpcomponents.client5:httpclient5:$apachehttpclient_version")
+
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("com.alibaba.fastjson2:fastjson2:$fastjson2_version")
+//    testImplementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    jvmArgs(['-XX:+EnableDynamicAgentLoading', '-Xshare:off'])
+}
+
+shadowJar {
+    archiveClassifier.set('all') // 可选：为生成的 JAR 文件添加分类器（例如 `-all`）
+    mergeServiceFiles() // 合并服务文件（如果需要）
+}
+
+application {
+    mainClass = 'com.outofstack.metaplus.syncer.hive.MetastoreConsumer' // 指定主类
+}
+
+// ========== 现代化路径配置 ==========
+def distDir = layout.buildDirectory.dir('dist')
+def libDir = distDir.map { it.dir('lib') }
+def confDir = distDir.map { it.dir('conf') }
+def binDir = distDir.map { it.dir('bin') }
+def logDir = distDir.map { it.dir('log') }
+
+// ========== 任务配置 ==========
+tasks.register('copyMainJar', Copy) {
+    from jar.archiveFile
+    into libDir
+}
+
+tasks.register('copyLibs', Copy) {
+    from configurations.runtimeClasspath
+    into libDir
+}
+
+tasks.register('copyConfigs', Copy) {
+    from 'src/main/resources'
+    include '*.yml', '*.properties', '*.xml', '*.md'
+    into confDir
+}
+
+tasks.register('copyScripts', Copy) {
+    from 'src/main/script'
+    into binDir
+    fileMode 0755  // 设置Linux执行权限
+}
+
+tasks.register('buildDist', Sync) {
+    dependsOn jar, copyMainJar, copyLibs, copyConfigs, copyScripts
+
+    preserve {
+        include 'bin/**'
+        include 'conf/**'
+        include 'lib/**'
+    }
+
+    // destinationDirectory = distDir
+    into distDir
+}
+
+// 打包成ZIP
+tasks.register('packageDist', Zip) {
+    dependsOn tasks.named('buildDist')
+    zip64 = true
+
+    archiveFileName = "${project.name}-${version}.zip"
+    destinationDirectory = layout.buildDirectory
+
+    from(distDir) {
+        include '**/*'
+        into "${project.name}-${version}"  // ZIP内的根目录
+    }
+
+    // 保留文件权限（Linux/Unix系统）
+    fileMode 0644
+    dirMode 0755
+}
+
+tasks.named('build') {
+    dependsOn 'packageDist'
+}

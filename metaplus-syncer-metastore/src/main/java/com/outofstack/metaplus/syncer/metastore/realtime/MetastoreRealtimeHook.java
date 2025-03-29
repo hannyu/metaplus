@@ -1,16 +1,17 @@
-package com.outofstack.metaplus.syncer.hive;
+package com.outofstack.metaplus.syncer.metastore.realtime;
 
 import com.outofstack.metaplus.common.DateUtil;
 import com.outofstack.metaplus.common.PropertyConfig;
-import com.outofstack.metaplus.common.json.JsonArray;
 import com.outofstack.metaplus.common.json.JsonDiff;
 import com.outofstack.metaplus.common.json.JsonObject;
+import com.outofstack.metaplus.common.model.DocUtil;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.common.model.MetaplusPatch;
 import com.outofstack.metaplus.common.model.PatchMethod;
 import com.outofstack.metaplus.common.model.search.Query;
 import com.outofstack.metaplus.common.sync.FileProducer;
 import com.outofstack.metaplus.domain.TableDomain;
+import com.outofstack.metaplus.syncer.metastore.MetastoreUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.MetaStoreEventListener;
 import org.apache.hadoop.hive.metastore.api.*;
@@ -25,12 +26,14 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class MetaplusMetastoreHook extends MetaStoreEventListener {
+public class MetastoreRealtimeHook extends MetaStoreEventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(MetaplusMetastoreHook.class);
+    private static final Logger log = LoggerFactory.getLogger(MetastoreRealtimeHook.class);
+
+    public static String realtimeSyncerName = "realtime-" + PropertyConfig.getSyncerHostname();
     private FileProducer producer;
 
-    public MetaplusMetastoreHook(Configuration config) {
+    public MetastoreRealtimeHook(Configuration config) {
         super(config);
 
         String logname = MetastoreUtil.getPatchlogName();
@@ -38,7 +41,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
     }
 
     private void produce(MetaplusPatch patch) {
-        producer.produce(patch);
+        producer.produce(patch.toJson());
     }
 
     @Override
@@ -50,7 +53,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
 
         MetaplusDoc doc = MetastoreUtil.packTableDoc(table);
         doc.setSyncCreatedAt(createdAt);
-        doc.setSyncCreatedFrom(PropertyConfig.getSyncerHostname());
+        doc.setSyncCreatedFrom(realtimeSyncerName);
         produce(new MetaplusPatch(PatchMethod.META_CREATE, doc));
 
         // create column
@@ -58,7 +61,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
             MetaplusDoc colDoc = MetastoreUtil.packColumnDoc(table, fs);
 //            colDoc.setSyncCreatedBy(owner);
             colDoc.setSyncCreatedAt(createdAt);
-            colDoc.setSyncCreatedFrom(PropertyConfig.getSyncerHostname());
+            colDoc.setSyncCreatedFrom(realtimeSyncerName);
             produce(new MetaplusPatch(PatchMethod.META_CREATE, colDoc));
         }
     }
@@ -73,19 +76,21 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
         Table newTable = tableEvent.getNewTable();
         MetaplusDoc oldDoc = MetastoreUtil.packTableDoc(oldTable);
         MetaplusDoc newDoc = MetastoreUtil.packTableDoc(newTable);
-        List<String[]> diffs = JsonDiff.diff(oldDoc, newDoc);
+        List<String[]> diffs = DocUtil.diffDoc(oldDoc, newDoc);
 //        System.out.println(JsonObject.object2JsonString(diffs));
 
-        long difcnt = diffs.stream().filter(dif -> !dif[0].startsWith("$.meta.tableParams.")).count();
-        if (difcnt > 0) {
-            newDoc.setSyncUpdatedAt(updatedAt);
-            newDoc.setSyncUpdatedFrom(PropertyConfig.getSyncerHostname());
-            produce(new MetaplusPatch(PatchMethod.META_UPDATE, newDoc));
-        }
-
-        /// rename tableName
+        diffs = diffs.stream().filter(dif -> !dif[0].startsWith("$.meta.tableParams.")).toList();
         if (diffs.stream().anyMatch(dif -> dif[0].equals("$.meta.tableName"))) {
-            // update all table_column
+            /// rename tableName
+            newDoc.setSyncUpdatedAt(updatedAt);
+            newDoc.setSyncUpdatedFrom(realtimeSyncerName);
+            MetaplusPatch patch0 = new MetaplusPatch(PatchMethod.PATCH_UPDATE, newDoc);
+            Query query0 = new Query();
+            query0.setQuery(new JsonObject("term", new JsonObject("fqmn.fqmn", oldDoc.getFqmnFqmn())));
+            patch0.setPatch(query0);
+            produce(patch0);
+
+            /// update all table_column
             MetaplusPatch patch1 = new MetaplusPatch(PatchMethod.PATCH_UPDATE, TableDomain.DOMAIN_TABLE_COLUMN);
             Query query1 = new Query();
             query1.setQuery(new JsonObject("term",
@@ -96,12 +101,12 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
                                     .put("tableName", newDoc.getMeta().getString("tableName")))
                             .put("sync", new JsonObject()
                                     .put("updatedAt", updatedAt)
-                                    .put("updatedFrom", PropertyConfig.getSyncerHostname()))));
+                                    .put("updatedFrom", realtimeSyncerName))));
             patch1.setPatch(query1);
             produce(patch1);
 
-            // update all table_partition
-            MetaplusPatch patch2 = new MetaplusPatch(PatchMethod.PATCH_UPDATE, TableDomain.DOMAIN_TABLE_COLUMN);
+            /// update all table_partition
+            MetaplusPatch patch2 = new MetaplusPatch(PatchMethod.PATCH_UPDATE, TableDomain.DOMAIN_TABLE_PARTITION);
             Query query2 = new Query();
             query2.setQuery(new JsonObject("term",
                     new JsonObject("meta.tableName", oldDoc.getMeta().getString("tableName"))));
@@ -111,35 +116,44 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
                                     .put("tableName", newDoc.getMeta().getString("tableName")))
                             .put("sync", new JsonObject()
                                     .put("updatedAt", updatedAt)
-                                    .put("updatedFrom", PropertyConfig.getSyncerHostname()))));
+                                    .put("updatedFrom", realtimeSyncerName))));
             patch2.setPatch(query2);
             produce(patch2);
+        } else if (!diffs.isEmpty()) {
+            /// update table
+            newDoc.setSyncUpdatedAt(updatedAt);
+            newDoc.setSyncUpdatedFrom(realtimeSyncerName);
+            produce(new MetaplusPatch(PatchMethod.META_UPDATE, newDoc));
+
+            /// update/add/delete column
+            diffs.forEach(dif -> {
+                if (dif[0].startsWith("$.meta.columns[")) {
+                    int i = Integer.parseInt(dif[0].substring("$.meta.columns[".length(), dif[0].indexOf("]")));
+                    if (dif[1].equals("+")) {
+                        MetaplusDoc colDoc = MetastoreUtil.packColumnDoc(newTable, newTable.getSd().getCols().get(i));
+                        colDoc.setSyncUpdatedAt(updatedAt);
+                        colDoc.setSyncUpdatedFrom(realtimeSyncerName);
+                        produce(new MetaplusPatch(PatchMethod.META_CREATE, colDoc));
+                    } else if (dif[1].equals("-")) {
+                        // no way in hive?
+                        MetaplusDoc colDoc = MetastoreUtil.packColumnDoc(newTable, oldTable.getSd().getCols().get(i));
+                        colDoc.setSyncUpdatedAt(updatedAt);
+                        colDoc.setSyncUpdatedFrom(realtimeSyncerName);
+                        produce(new MetaplusPatch(PatchMethod.META_DELETE, colDoc));
+                    } else if (dif[1].equals("!")) {
+                        // no way in hive?
+                        MetaplusDoc colDoc = MetastoreUtil.packColumnDoc(newTable, newTable.getSd().getCols().get(i));
+                        colDoc.setSyncUpdatedAt(updatedAt);
+                        colDoc.setSyncUpdatedFrom(realtimeSyncerName);
+                        produce(new MetaplusPatch(PatchMethod.META_UPDATE, colDoc));
+                    }
+                }
+            });
         }
 
-        /// update/add/delete column
-        diffs.forEach(dif -> {
-            if (dif[0].startsWith("$.meta.columns[")) {
-                int i = Integer.parseInt(dif[0].substring("$.meta.columns[".length(), dif[0].indexOf("]")));
-                if (dif[1].equals("+")) {
-                    MetaplusDoc colDoc = MetastoreUtil.packColumnDoc(newTable, newTable.getSd().getCols().get(i));
-                    colDoc.setSyncUpdatedAt(updatedAt);
-                    colDoc.setSyncUpdatedFrom(PropertyConfig.getSyncerHostname());
-                    produce(new MetaplusPatch(PatchMethod.META_CREATE, colDoc));
-                } else if (dif[1].equals("-")) {
-                    // no way in hive?
-                    MetaplusDoc colDoc = MetastoreUtil.packColumnDoc(newTable, oldTable.getSd().getCols().get(i));
-                    colDoc.setSyncUpdatedAt(updatedAt);
-                    colDoc.setSyncUpdatedFrom(PropertyConfig.getSyncerHostname());
-                    produce(new MetaplusPatch(PatchMethod.META_DELETE, colDoc));
-                } else if (dif[1].equals("!")) {
-                    // no way in hive?
-                    MetaplusDoc colDoc = MetastoreUtil.packColumnDoc(newTable, newTable.getSd().getCols().get(i));
-                    colDoc.setSyncUpdatedAt(updatedAt);
-                    colDoc.setSyncUpdatedFrom(PropertyConfig.getSyncerHostname());
-                    produce(new MetaplusPatch(PatchMethod.META_UPDATE, colDoc));
-                }
-            }
-        });
+
+
+
 
         /// update/add/delete partition
         // See onAddPartition, onDropPartition, onAlterPartition
@@ -152,7 +166,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
         /// delete table
         MetaplusDoc doc = MetastoreUtil.packTableDoc(tableEvent.getTable());
         doc.setSyncUpdatedAt(updatedAt);
-        doc.setSyncUpdatedFrom(PropertyConfig.getSyncerHostname());
+        doc.setSyncUpdatedFrom(realtimeSyncerName);
 
         MetaplusPatch patch1 = new MetaplusPatch(PatchMethod.META_DELETE, doc);
         produce(patch1);
@@ -164,7 +178,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
                 new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))));
         query2.setScript(new JsonObject("params", new JsonObject("sync", new JsonObject()
                 .put("updatedAt", updatedAt)
-                .put("updatedFrom", PropertyConfig.getSyncerHostname()))));
+                .put("updatedFrom", realtimeSyncerName))));
         patch2.setPatch(query2);
         produce(patch2);
 
@@ -175,7 +189,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
                 new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))));
         query3.setScript(new JsonObject("params", new JsonObject("sync", new JsonObject()
                 .put("updatedAt", updatedAt)
-                .put("updatedFrom", PropertyConfig.getSyncerHostname()))));
+                .put("updatedFrom", realtimeSyncerName))));
         patch3.setPatch(query3);
         produce(patch3);
     }
@@ -191,7 +205,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
             Partition partition = pits.next();
             MetaplusDoc partDoc = MetastoreUtil.packPartitionDoc(partition, partitionFields);
             partDoc.setSyncUpdatedAt(updatedAt);
-            partDoc.setSyncUpdatedFrom(PropertyConfig.getSyncerHostname());
+            partDoc.setSyncUpdatedFrom(realtimeSyncerName);
             produce(new MetaplusPatch(PatchMethod.META_CREATE, partDoc));
         }
     }
@@ -206,7 +220,7 @@ public class MetaplusMetastoreHook extends MetaStoreEventListener {
             Partition partition = pits.next();
             MetaplusDoc partDoc = MetastoreUtil.packPartitionDoc(partition, partitionFields);
             partDoc.setSyncUpdatedAt(updatedAt);
-            partDoc.setSyncUpdatedFrom(PropertyConfig.getSyncerHostname());
+            partDoc.setSyncUpdatedFrom(realtimeSyncerName);
             produce(new MetaplusPatch(PatchMethod.META_DELETE, partDoc));
         }
     }

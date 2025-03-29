@@ -1,4 +1,4 @@
-package com.outofstack.metaplus.syncer.hive;
+package com.outofstack.metaplus.syncer.metastore;
 
 import com.outofstack.metaplus.common.PropertyConfig;
 import com.outofstack.metaplus.common.json.JsonArray;
@@ -11,8 +11,6 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 
 import java.util.List;
-
-import static org.apache.hadoop.hive.common.StatsSetupConst.StatDB.fs;
 
 public class MetastoreUtil {
 
@@ -36,7 +34,7 @@ public class MetastoreUtil {
             columns.add(new JsonObject()
                     .put("name", fs.getName())
                     .put("type", fs.getType())
-                    .put("comment", fs.getComment()));
+                    .put("comment", fs.getComment() == null ? "" : fs.getComment()));
         }
         return columns;
     }
@@ -49,7 +47,7 @@ public class MetastoreUtil {
                 partitionKeys.append(fs.getName());
                 first = false;
             } else {
-                partitionKeys.append(",");
+                partitionKeys.append("/");
                 partitionKeys.append(fs.getName());
             }
         }
@@ -73,7 +71,7 @@ public class MetastoreUtil {
                 partitionValueStr.append(partitionFields.get(i).getName()).append("=").append(partitionValues.get(i));
                 first = false;
             } else {
-                partitionValueStr.append(",");
+                partitionValueStr.append("/");
                 partitionValueStr.append(partitionFields.get(i).getName()).append("=").append(partitionValues.get(i));
             }
         }
@@ -88,7 +86,7 @@ public class MetastoreUtil {
 
         // produce table
         MetaplusDoc doc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE,
-                TableDomain.packTableFqmnName(catalogName, dbName, tableName));
+                TableDomain.packFqmnName(catalogName, dbName, tableName));
         JsonObject meta = doc.getMeta();
         meta.put("catalogName", catalogName);
         meta.put("dbName", dbName);
@@ -110,7 +108,7 @@ public class MetastoreUtil {
 
     public static MetaplusDoc packColumnDoc(Table table, FieldSchema fs) {
         MetaplusDoc colDoc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE_COLUMN,
-                TableDomain.packTableFqmnName(table.getCatName(), table.getDbName(),
+                TableDomain.packFqmnName(table.getCatName(), table.getDbName(),
                         table.getTableName()) + "." + fs.getName());
         JsonObject colMeta = colDoc.getMeta();
         colMeta.put("catalogName", table.getCatName());
@@ -118,14 +116,14 @@ public class MetastoreUtil {
         colMeta.put("tableName", table.getTableName());
         colMeta.put("columnName", fs.getName());
         colMeta.put("columnType", fs.getType());
-        colMeta.put("columnComment", fs.getComment());
+        colMeta.put("columnComment", fs.getComment() == null ? "" : fs.getComment());
         return colDoc;
     }
 
     public static MetaplusDoc packPartitionDoc(Partition partition, List<FieldSchema> partitionFields) {
         String partValues = packPartitionValues(partition, partitionFields);
         MetaplusDoc partDoc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE_PARTITION,
-                TableDomain.packTableFqmnName(partition.getCatName(), partition.getDbName(),
+                TableDomain.packFqmnName(partition.getCatName(), partition.getDbName(),
                         partition.getTableName()) + "(" + partValues + ")");
 
         JsonObject partMeta = partDoc.getMeta();

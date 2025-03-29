@@ -1,4 +1,4 @@
-package com.outofstack.metaplus.syncer.hive;
+package com.outofstack.metaplus.syncer.metastore.realtime;
 
 import com.outofstack.metaplus.common.PropertyConfig;
 import com.outofstack.metaplus.common.file.DailyRollingLogger;
