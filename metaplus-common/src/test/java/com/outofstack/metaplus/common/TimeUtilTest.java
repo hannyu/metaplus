@@ -8,30 +8,30 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-class DateUtilTest {
+class TimeUtilTest {
 
     @Test
     public void testOne() {
 
         ZonedDateTime now = ZonedDateTime.now();
-        String s1 = DateUtil.format(now);
-        String s2 = DateUtil.format(DateUtil.parse(s1));
+        String s1 = TimeUtil.format(now);
+        String s2 = TimeUtil.format(TimeUtil.parse(s1));
         System.out.println(s2);
         assertEquals(s2, s1);
 
         String s3 = "2025-01-01T17:41:38.071+0800";
-        ZonedDateTime t1 = DateUtil.parse(s3);
+        ZonedDateTime t1 = TimeUtil.parse(s3);
         assertEquals("+08:00", t1.getZone().getId());
         assertEquals(1735724498071L, t1.toInstant().toEpochMilli());
 
-        String s4 = DateUtil.epochMilli2Formatted(1735724498071L);
+        String s4 = TimeUtil.epochMilli2Formatted(1735724498071L);
         assertEquals(s3, s4);
 
-        long ts3 = DateUtil.formatted2EpochMilli(s3);
+        long ts3 = TimeUtil.formatted2EpochMilli(s3);
         assertEquals(1735724498071L, ts3);
 
         assertThrows(RuntimeException.class, () -> {
-            ZonedDateTime t2 = DateUtil.parse("sha ye bu shi");
+            ZonedDateTime t2 = TimeUtil.parse("sha ye bu shi");
         });
 
     }

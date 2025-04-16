@@ -35,16 +35,23 @@ public class Hits extends JsonObject {
         return getJsonArrayByPath(PATH_HITS).size();
     }
 
+    public JsonObject getHitsItem(int idx) {
+        return getJsonArrayByPath(PATH_HITS).getJsonObject(idx);
+    }
+
     public MetaplusDoc getHitsDoc(int idx) {
-        JsonArray hits = getJsonArrayByPath(PATH_HITS);
-        JsonObject item = hits.getJsonObject(idx);
+        JsonObject item = getHitsItem(idx);
         if (null == item) {
-            throw new IllegalArgumentException("A SearchHits has null item at idx '" + idx + "'");
+            throw new IllegalArgumentException("Hits has null item at idx '" + idx + "'");
         } else {
-            MetaplusDoc doc = new MetaplusDoc(item.getJsonObject("_source"));
-            doc.internalSetId(item.getString("_id"));
-            doc.setSyncVersion(item.getInteger("_version"));
-            return doc;
+            try {
+                MetaplusDoc doc = new MetaplusDoc(item.getJsonObject("_source"));
+                doc.internalSetId(item.getString("_id"));
+                doc.setSyncVersion(item.getInteger("_version"));
+                return doc;
+            } catch (RuntimeException e) {
+                throw new IllegalArgumentException("Hits has NOT a MetaplusDoc item, see: " + item);
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.outofstack.metaplus.common.file;
 
-import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.TimeUtil;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -30,9 +30,9 @@ public class DailyRollingLogger {
         if (Files.exists(logpath)) {
             long lastModified = Files.getLastModifiedTime(logpath).toMillis();
             Instant instant = Instant.ofEpochMilli(lastModified);
-            lastWriteYmd = DateUtil.toYmdInt(LocalDate.ofInstant(instant, ZoneId.systemDefault()));
+            lastWriteYmd = TimeUtil.toYmdInt(LocalDate.ofInstant(instant, ZoneId.systemDefault()));
         } else {
-            lastWriteYmd = DateUtil.toYmdInt(LocalDate.now());
+            lastWriteYmd = TimeUtil.toYmdInt(LocalDate.now());
         }
         buffer = Files.newBufferedWriter(logpath, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 
@@ -61,7 +61,7 @@ public class DailyRollingLogger {
     }
 
     public void checkAndBackup() throws IOException {
-        int nowWriteYmd = DateUtil.toYmdInt(LocalDate.now());
+        int nowWriteYmd = TimeUtil.toYmdInt(LocalDate.now());
         if (lastWriteYmd != nowWriteYmd) {
             close();
             Path backuppath = logpath.getParent().resolve(logpath.getFileName().toString() + "." + lastWriteYmd);

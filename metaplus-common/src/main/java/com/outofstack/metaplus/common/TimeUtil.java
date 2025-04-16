@@ -4,7 +4,7 @@ package com.outofstack.metaplus.common;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
-public class DateUtil {
+public class TimeUtil {
 
     private static final DateTimeFormatter F1 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 

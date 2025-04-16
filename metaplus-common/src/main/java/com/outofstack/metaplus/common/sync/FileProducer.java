@@ -1,8 +1,7 @@
 package com.outofstack.metaplus.common.sync;
 
-import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.TimeUtil;
 import com.outofstack.metaplus.common.file.DailyRollingLogger;
-import com.outofstack.metaplus.common.model.MetaplusPatch;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,7 +25,7 @@ public class FileProducer {
     public void produce(String line) {
         if (null != patchlog && null != line) {
             try {
-                patchlog.writeLine(DateUtil.formatNow(), ",", line);
+                patchlog.writeLine(TimeUtil.formatNow(), ",", line);
             } catch (IOException e) {
                 System.err.println("Metaplus: Write patchlog fail. Error: " + e.toString());
             }
