@@ -1,6 +1,6 @@
 package com.outofstack.metaplus.server.service;
 
-import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.TimeUtil;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.json.JsonRule;
 import com.outofstack.metaplus.common.model.DocUtil;
@@ -73,15 +73,15 @@ public abstract class AbstractService {
 
     String fixupAt(String at) {
         if (null == at || at.isEmpty()) {
-            return  DateUtil.formatNow();
+            return  TimeUtil.formatNow();
         } else {
             try {
-                return DateUtil.epochMilli2Formatted(Long.parseLong(at));
+                return TimeUtil.epochMilli2Formatted(Long.parseLong(at));
             } catch (RuntimeException e) {
                 try {
-                    return DateUtil.format(DateUtil.tryParse(at));
+                    return TimeUtil.format(TimeUtil.tryParse(at));
                 } catch (RuntimeException e2) {
-                    return DateUtil.formatNow();
+                    return TimeUtil.formatNow();
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.outofstack.metaplus.server.dao;
 
-import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.TimeUtil;
 import com.outofstack.metaplus.common.json.JsonArray;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.json.JsonRule;
@@ -361,7 +361,7 @@ public class DomainLib {
                         } else if ("boolean".equals(type)) {
                             sample.put(key, false);
                         } else if ("date".equals(type)) {
-                            sample.put(key, DateUtil.formatNow());
+                            sample.put(key, TimeUtil.formatNow());
                         } else if ("long".equals(type) || "integer".equals(type) || "short".equals(type) ||
                                 "byte".equals(type) || "double".equals(type) || "float".equals(type)) {
                             sample.put(key, 0);

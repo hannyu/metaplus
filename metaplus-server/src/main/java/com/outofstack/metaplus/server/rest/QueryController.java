@@ -4,13 +4,11 @@ import com.outofstack.metaplus.common.http.HttpResponse;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.common.model.search.Hits;
+import com.outofstack.metaplus.common.model.search.Query;
 import com.outofstack.metaplus.server.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/query")
 @RestController
@@ -45,6 +43,14 @@ public class QueryController {
         Hits hits = queryService.simpleSearch(domains, queryText);
         return new HttpResponse<Hits>(200, hits);
     }
+
+
+    @GetMapping("/search/{domains}")
+    public HttpResponse<Hits> search(@PathVariable String domains, @RequestBody JsonObject requestBody) {
+        Hits hits = queryService.search(domains, new Query(requestBody));
+        return new HttpResponse<Hits>(200, hits);
+    }
+
 
 
 }

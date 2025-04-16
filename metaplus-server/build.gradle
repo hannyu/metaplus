@@ -1,12 +1,19 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.0'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 apply plugin: 'io.spring.dependency-management'
 
 group = "com.outofstack.metaplus"
 version = "$metaplus_version"
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
@@ -18,13 +25,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.httpcomponents.client5:httpclient5")
 
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-tasks.test {
+tasks.named('test') {
     useJUnitPlatform()
     jvmArgs(['-XX:+EnableDynamicAgentLoading', '-Xshare:off'])
 }

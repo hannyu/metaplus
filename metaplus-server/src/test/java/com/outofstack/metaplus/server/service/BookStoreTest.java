@@ -1,11 +1,13 @@
 package com.outofstack.metaplus.server.service;
 
-import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.TimeUtil;
+import com.outofstack.metaplus.common.json.JsonArray;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.*;
 import com.outofstack.metaplus.common.model.schema.Field;
 import com.outofstack.metaplus.common.model.schema.Properties;
 import com.outofstack.metaplus.common.model.search.Hits;
+import com.outofstack.metaplus.common.model.search.Query;
 import com.outofstack.metaplus.server.MetaplusServerAppTest;
 import com.outofstack.metaplus.server.storage.EsClient;
 import org.junit.jupiter.api.AfterAll;
@@ -113,7 +115,7 @@ public class BookStoreTest {
                 .put("title", "钢铁是怎样练成的")
                 .put("pageCount", 5555)
                 .put("isPublished", true)
-                .put("publishDate", DateUtil.formatNow())
+                .put("publishDate", TimeUtil.formatNow())
                 .put("sth_not_exist", "Yes, i am not exist~");
         doc1.getPlus().put("desc", "说点啥呢???");
         metaService.create(doc1);
@@ -206,21 +208,29 @@ public class BookStoreTest {
             metaService.create(book);
         }
 
-//        // wait ES build index
-//        Thread.sleep(1000);
-
-        // simple search
+        // simpleSearch
         Hits hits = queryService.simpleSearch("book", "偏见");
-        System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
+        System.out.println("simpleSearch total: " + hits.getHitsSize() + ", hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
 
         hits = queryService.simpleSearch("*", "moby");
-        System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
+        System.out.println("simpleSearch total: " + hits.getHitsSize() + ", hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
 
         hits = queryService.simpleSearch("book", "人 +-局外");
-        System.out.println("total [" + hits.getHitsSize() + "] hits: " + hits);
+        System.out.println("simpleSearch total: " + hits.getHitsSize() + ", hits: " + hits);
         assertTrue(hits.getHitsSize() > 0);
+
+        // search
+        Query query = new Query();
+        query.setQuery(new JsonObject("bool", new JsonObject("must", new JsonArray()
+                .add(new JsonObject("match", new JsonObject("meta.title", "人")))
+                .add(new JsonObject("range", new JsonObject("meta.pageCount", new JsonObject("lt", 500))))
+        )));
+        query.setSort(new JsonArray(new JsonObject("meta.isbn", new JsonObject("order", "asc"))));
+        hits = queryService.search("book", query);
+        System.out.println("search total: " + hits.getHitsSize() + ", hits: " + hits);
+
     }
 
 
@@ -235,7 +245,7 @@ public class BookStoreTest {
                 .put("title", "钢铁是怎样练成的")
                 .put("pageCount", 5555)
                 .put("isPublished", true)
-                .put("publishDate", DateUtil.formatNow())
+                .put("publishDate", TimeUtil.formatNow())
                 .put("sth_not_exist", "Yes, i am not exist~");
         doc1.getPlus().put("desc", "说点啥呢???");
         metaService.create(doc1);
@@ -328,4 +338,6 @@ public class BookStoreTest {
         System.out.println("doc3: " + doc3);
         assertEquals("222", doc3.getMeta().getString("cat"));
     }
+
+
 }

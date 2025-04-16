@@ -35,18 +35,30 @@ public class QueryService extends AbstractService {
     }
 
 
-    public Hits simpleSearch(String domains, String queryText) {
+    public Hits simpleSearch(String domains, String searchText) {
         List<String> domainList = validateDomainsAnd2List(domains);
-        if (null == queryText || queryText.isEmpty()) {
-            throw new IllegalArgumentException("Search queryText is empty.");
+        if (null == searchText || searchText.isEmpty()) {
+            throw new IllegalArgumentException("Search searchText is empty.");
         }
 
         Query query = new Query();
-        query.setQuery(new JsonObject("simple_query_string", new JsonObject("query", queryText)));
+        query.setQuery(new JsonObject("simple_query_string", new JsonObject("query", searchText)));
         return searchDao.query(domainList, query);
     }
 
 
+    public Hits search(String domains, Query query) {
+        List<String> domainList = validateDomainsAnd2List(domains);
+        validateQuery(query);
 
+        return searchDao.query(domainList, query);
+    }
+
+
+    private void validateQuery(Query query) {
+        if (null == query || query.getQuery().isEmpty()) {
+            throw new IllegalArgumentException("Search query is empty.");
+        }
+    }
 
 }
