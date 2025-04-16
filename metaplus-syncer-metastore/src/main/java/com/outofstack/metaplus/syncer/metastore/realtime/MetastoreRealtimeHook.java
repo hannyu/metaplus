@@ -1,8 +1,8 @@
 package com.outofstack.metaplus.syncer.metastore.realtime;
 
-import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.TimeUtil;
 import com.outofstack.metaplus.common.PropertyConfig;
-import com.outofstack.metaplus.common.json.JsonDiff;
+import com.outofstack.metaplus.common.json.JsonArray;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.DocUtil;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
@@ -48,7 +48,7 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
     public void onCreateTable(CreateTableEvent tableEvent) throws MetaException {
         // create table
         Table table = tableEvent.getTable();
-        String createdAt = DateUtil.formatNow();
+        String createdAt = TimeUtil.formatNow();
 //        String owner = table.getOwner();
 
         MetaplusDoc doc = MetastoreUtil.packTableDoc(table);
@@ -69,7 +69,7 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
 
     @Override
     public void onAlterTable(AlterTableEvent tableEvent) throws MetaException {
-        String updatedAt = DateUtil.formatNow();
+        String updatedAt = TimeUtil.formatNow();
 
         /// update table, except tableParams
         Table oldTable = tableEvent.getOldTable();
@@ -93,8 +93,11 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
             /// update all table_column
             MetaplusPatch patch1 = new MetaplusPatch(PatchMethod.PATCH_UPDATE, TableDomain.DOMAIN_TABLE_COLUMN);
             Query query1 = new Query();
-            query1.setQuery(new JsonObject("term",
-                    new JsonObject("meta.tableName", oldDoc.getMeta().getString("tableName"))));
+            query1.setQuery(new JsonObject("bool", new JsonObject("filter", new JsonArray()
+                    .add(new JsonObject("term", new JsonObject("meta.catalogName", oldDoc.getMeta().getString("catalogName"))))
+                    .add(new JsonObject("term", new JsonObject("meta.dbName", oldDoc.getMeta().getString("dbName"))))
+                    .add(new JsonObject("term", new JsonObject("meta.tableName", oldDoc.getMeta().getString("tableName"))))
+            )));
             query1.setScript(new JsonObject()
                     .put("params", new JsonObject()
                             .put("meta", new JsonObject()
@@ -108,8 +111,13 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
             /// update all table_partition
             MetaplusPatch patch2 = new MetaplusPatch(PatchMethod.PATCH_UPDATE, TableDomain.DOMAIN_TABLE_PARTITION);
             Query query2 = new Query();
-            query2.setQuery(new JsonObject("term",
-                    new JsonObject("meta.tableName", oldDoc.getMeta().getString("tableName"))));
+//            query2.setQuery(new JsonObject("term",
+//                    new JsonObject("meta.tableName", oldDoc.getMeta().getString("tableName"))));
+            query1.setQuery(new JsonObject("bool", new JsonObject("filter", new JsonArray()
+                    .add(new JsonObject("term", new JsonObject("meta.catalogName", oldDoc.getMeta().getString("catalogName"))))
+                    .add(new JsonObject("term", new JsonObject("meta.dbName", oldDoc.getMeta().getString("dbName"))))
+                    .add(new JsonObject("term", new JsonObject("meta.tableName", oldDoc.getMeta().getString("tableName"))))
+            )));
             query2.setScript(new JsonObject()
                     .put("params", new JsonObject()
                             .put("meta", new JsonObject()
@@ -151,18 +159,14 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
             });
         }
 
-
-
-
-
         /// update/add/delete partition
-        // See onAddPartition, onDropPartition, onAlterPartition
+        /// See onAddPartition, onDropPartition, onAlterPartition
     }
 
 
     @Override
     public void onDropTable(DropTableEvent tableEvent) throws MetaException {
-        String updatedAt = DateUtil.formatNow();
+        String updatedAt = TimeUtil.formatNow();
         /// delete table
         MetaplusDoc doc = MetastoreUtil.packTableDoc(tableEvent.getTable());
         doc.setSyncUpdatedAt(updatedAt);
@@ -174,8 +178,13 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
         /// delete all table_column
         MetaplusPatch patch2 = new MetaplusPatch(PatchMethod.PATCH_DELETE, TableDomain.DOMAIN_TABLE_COLUMN);
         Query query2 = new Query();
-        query2.setQuery(new JsonObject("term",
-                new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))));
+//        query2.setQuery(new JsonObject("term",
+//                new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))));
+        query2.setQuery(new JsonObject("bool", new JsonObject("filter", new JsonArray()
+                .add(new JsonObject("term", new JsonObject("meta.catalogName", doc.getMeta().getString("catalogName"))))
+                .add(new JsonObject("term", new JsonObject("meta.dbName", doc.getMeta().getString("dbName"))))
+                .add(new JsonObject("term", new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))))
+        )));
         query2.setScript(new JsonObject("params", new JsonObject("sync", new JsonObject()
                 .put("updatedAt", updatedAt)
                 .put("updatedFrom", realtimeSyncerName))));
@@ -185,8 +194,13 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
         /// delete all table_partition
         MetaplusPatch patch3 = new MetaplusPatch(PatchMethod.PATCH_DELETE, TableDomain.DOMAIN_TABLE_PARTITION);
         Query query3 = new Query();
-        query3.setQuery(new JsonObject("term",
-                new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))));
+//        query3.setQuery(new JsonObject("term",
+//                new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))));
+        query3.setQuery(new JsonObject("bool", new JsonObject("filter", new JsonArray()
+                .add(new JsonObject("term", new JsonObject("meta.catalogName", doc.getMeta().getString("catalogName"))))
+                .add(new JsonObject("term", new JsonObject("meta.dbName", doc.getMeta().getString("dbName"))))
+                .add(new JsonObject("term", new JsonObject("meta.tableName", doc.getMeta().getString("tableName"))))
+        )));
         query3.setScript(new JsonObject("params", new JsonObject("sync", new JsonObject()
                 .put("updatedAt", updatedAt)
                 .put("updatedFrom", realtimeSyncerName))));
@@ -197,7 +211,7 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
 
     @Override
     public void onAddPartition(AddPartitionEvent partitionEvent) throws MetaException {
-        String updatedAt = DateUtil.formatNow();
+        String updatedAt = TimeUtil.formatNow();
         // add many table_partition
         List<FieldSchema> partitionFields = partitionEvent.getTable().getPartitionKeys();
         Iterator<Partition> pits = partitionEvent.getPartitionIterator();
@@ -212,7 +226,7 @@ public class MetastoreRealtimeHook extends MetaStoreEventListener {
 
     @Override
     public void onDropPartition(DropPartitionEvent partitionEvent) throws MetaException {
-        String updatedAt = DateUtil.formatNow();
+        String updatedAt = TimeUtil.formatNow();
         // delete many table_partition
         List<FieldSchema> partitionFields = partitionEvent.getTable().getPartitionKeys();
         Iterator<Partition> pits = partitionEvent.getPartitionIterator();

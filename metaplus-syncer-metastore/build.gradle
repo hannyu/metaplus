@@ -11,6 +11,11 @@ repositories {
     mavenCentral()
 }
 
+configurations.configureEach {
+    exclude module: 'log4j-slf4j-impl'
+    exclude module: 'slf4j-reload4j'
+}
+
 dependencies {
     implementation(project(":metaplus-common"))
     implementation(project(":metaplus-client"))
@@ -35,6 +40,7 @@ tasks.test {
 }
 
 shadowJar {
+    zip64 = true
     archiveClassifier.set('all') // 可选：为生成的 JAR 文件添加分类器（例如 `-all`）
     mergeServiceFiles() // 合并服务文件（如果需要）
 }

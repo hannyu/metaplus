@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="ch.qos.logback" level="WARN"/>
+
+    <logger name="com.outofstack.metaplus" level="DEBUG"/>
+
+</configuration>

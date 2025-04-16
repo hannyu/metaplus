@@ -1,32 +1,46 @@
 package com.outofstack.metaplus.syncer.metastore.scheduled;
 
 import com.outofstack.metaplus.client.MetaplusClient;
-import com.outofstack.metaplus.common.DateUtil;
+import com.outofstack.metaplus.common.TimeUtil;
 import com.outofstack.metaplus.common.PropertyConfig;
 import com.outofstack.metaplus.common.http.HttpResponse;
-import com.outofstack.metaplus.common.json.JsonDiff;
+import com.outofstack.metaplus.common.json.JsonArray;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.common.model.DocUtil;
+import com.outofstack.metaplus.common.model.search.Hits;
+import com.outofstack.metaplus.common.model.search.Query;
 import com.outofstack.metaplus.domain.TableDomain;
 import com.outofstack.metaplus.syncer.metastore.MetastoreUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.PartitionsByExprRequest;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.thrift.TException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MetastoreScheduledSyncer {
 
     public static String scheduledSyncerName = "scheduled-" + PropertyConfig.getSyncerHostname();
 
-    public static void main(String[] args) throws TException {
+    private String metastoreUri;
+    private String metaplusServerUrl;
+
+    public MetastoreScheduledSyncer(String metastoreUri, String metaplusServerUrl) {
+        this.metastoreUri = metastoreUri;
+        this.metaplusServerUrl = metaplusServerUrl;
+    }
+
+
+    public synchronized void scheduledSync() throws Exception {
 
         /// 1 TODO：配置，metastore地址、黑白名单
-
-        /// 2 TODO：FQMN去重
 
         /// 3 handle table one by one
         Configuration conf = new Configuration();
@@ -35,26 +49,28 @@ public class MetastoreScheduledSyncer {
         MetaplusClient mpclient = new MetaplusClient("http://localhost:8020/");
 
         // 2. 创建客户端
-        try (HiveMetaStoreClient client = new HiveMetaStoreClient(conf)) {
+        try (HiveMetaStoreClient hmsclient = new HiveMetaStoreClient(conf)) {
+
+            // TODO: 按黑白名单过滤，生成新的数组，提前掌握同步工作量，了解进度
 
             // 3. 操作元数据示例
-            for (String catalogName : client.getCatalogs()) {
+            for (String catalogName : hmsclient.getCatalogs()) {
                 System.out.println("Catalog: " + catalogName);
 
                 // 获取所有数据库
-                for (String dbName : client.getAllDatabases(catalogName)) {
+                for (String dbName : hmsclient.getAllDatabases(catalogName)) {
                     System.out.println("Database: " + dbName);
 
                     // 获取所有表
-                    for (String tableName : client.getAllTables(catalogName, dbName)) {
-                        Table table = client.getTable(catalogName, dbName, tableName);
+                    for (String tableName : hmsclient.getAllTables(catalogName, dbName)) {
+                        Table table = hmsclient.getTable(catalogName, dbName, tableName);
                         System.out.println("Table: " + tableName + ", Loc: " + table.getSd().getLocation());
 
                         String fqmnName = TableDomain.packFqmnName(catalogName, dbName, tableName);
                         HttpResponse<MetaplusDoc> response = mpclient.queryRead(DocUtil.packFqmn("", "table", fqmnName));
                         if (response.isNotFound()) {
                             /// create table/column/partition
-                            String createdAt = DateUtil.formatNow();
+                            String createdAt = TimeUtil.formatNow();
 
                             // create table
                             MetaplusDoc doc = MetastoreUtil.packTableDoc(table);
@@ -71,9 +87,6 @@ public class MetastoreScheduledSyncer {
                                 System.out.println("-- metaCreate: " + colDoc.getFqmnFqmn());
                                 mpclient.metaCreate(colDoc.getFqmnFqmn(), colDoc);
                             }
-
-                            // create partitions? no.
-
                         } else if (response.isSuccess()) {
                             /// diff and update
                             MetaplusDoc oldDoc = response.getBody();
@@ -82,7 +95,7 @@ public class MetastoreScheduledSyncer {
                             diffs = diffs.stream().filter(dif -> !dif[0].startsWith("$.meta.tableParams.")).toList();
                             System.out.println("diffs: " + JsonObject.object2JsonString(diffs));
                             if (!diffs.isEmpty()) {
-                                String updatedAt = DateUtil.formatNow();
+                                String updatedAt = TimeUtil.formatNow();
 
                                 // update table
                                 newDoc.setSyncUpdatedAt(updatedAt);
@@ -119,12 +132,98 @@ public class MetastoreScheduledSyncer {
                                 });
                             }
                         } else {
-                            /// error, why?
+                            // error, why?
+                            // print error
+                            System.out.println("WHY? " + response);
+                            continue;
                         }
+
+                        // diff partition
+                        /// TODO: 搞清楚 listPartitionNames 的返回顺序？
+                        /// 假设 Metastore的返回是按分区名的字符顺序返回（并不是按添加分区的时间顺序），
+                        /// 若 分区数 大于 指定max，则会取不到最新的分区。
+                        /// --- 不太行的方案 ---
+                        /// 解决方案：一次读500，一直读，直到读完（最后一次读取返回不足500），
+                        /// 取最后的0~1000条，只对这最多1000条分区做diff（时间越久远，越不重要）
+                        /// diff只有新增，没有删除，更没有修改
+                        ///
+                        /// --- 只处理分区数小于10k的 ---
+
+                        int partitionCnt = hmsclient.getNumPartitionsByFilter(catalogName, dbName, tableName, "");
+                        System.out.println("partitionCnt: " + partitionCnt);
+
+                        if (partitionCnt <= MetastoreUtil.getMaxSupportedPartitions()) {
+                            List<String> newPartitions = hmsclient.listPartitionNames(catalogName, dbName, tableName, -1);
+                            System.out.println("newPartitions: " + JsonObject.object2JsonString(newPartitions));
+
+                            Query query = new Query();
+                            query.setQuery(new JsonObject("bool", new JsonObject("filter", new JsonArray()
+                                    .add(new JsonObject("term", new JsonObject("meta.catalogName", catalogName)))
+                                    .add(new JsonObject("term", new JsonObject("meta.dbName", dbName)))
+                                    .add(new JsonObject("term", new JsonObject("meta.tableName", tableName)))
+                            )));
+                            query.setSort(new JsonArray(new JsonObject("meta.partitionValues", new JsonObject("order", "asc"))));
+                            query.setSource(new JsonArray("meta.partitionValues"));
+                            query.setSize(10000);
+                            HttpResponse<Hits> hits = mpclient.querySearch(TableDomain.DOMAIN_TABLE_PARTITION, query);
+                            List<String> oldPartitions = MetastoreUtil.unpackPartitionsFromHits(hits.getBody());
+                            System.out.println("oldPartitions: " + oldPartitions);
+
+                            /// TODO: here
+
+                        } else {
+                            System.out.println("Table has '" + partitionCnt + "' partitions, exceed MaxSupportedPartitions '" +
+                                    MetastoreUtil.getMaxSupportedPartitions()+ "', so NOT sync the partition info.");
+                        }
+
+//                        oldPartitions.sort();
+//                        for (int i=0; i< newPartitions.size(); i++) {
+//
+//                        }
+
                     }
                 }
             }
         }
+    }
+
+//    private List<String> getLatestPartitionNames(HiveMetaStoreClient hmsclient, String catalogName, String dbName,
+//                                                 String tableName, short maxHalf) throws TException {
+//        List<String> lastHalfPartitionNames = null;
+//        List<String> newHalfPartitionNames = null;
+//        String lastPartitionName = null;
+//
+//        do {
+//            lastHalfPartitionNames = newHalfPartitionNames;
+//
+//            PartitionsByExprRequest request = new PartitionsByExprRequest();
+//            request.setCatName(catalogName);
+//            request.setDbName(dbName);
+//            request.setTblName(tableName);
+//            request.setMaxParts(maxHalf);
+//            if (null != lastPartitionName) {
+//
+//            }
+//
+//            newHalfPartitionNames = hmsclient.listPartitionNames(catalogName, dbName, tableName, maxHalf);
+//        } while (newHalfPartitionNames.size() == maxHalf);
+//
+//        if (null == lastHalfPartitionNames) {
+//            Collections.reverse(newHalfPartitionNames);
+//            return newHalfPartitionNames;
+//        } else {
+//            List<String> merged = new ArrayList<>(lastHalfPartitionNames.size() + newHalfPartitionNames.size());
+//            merged.addAll(lastHalfPartitionNames);
+//            merged.addAll(newHalfPartitionNames);
+//            Collections.reverse(merged);
+//            return merged;
+//        }
+//    }
+
+    public static void main(String[] args) throws Exception {
+        MetastoreScheduledSyncer mss = new MetastoreScheduledSyncer("thrift://localhost:9083/",
+                "http://localhost:8020/");
+        mss.scheduledSync();
     }
 
 

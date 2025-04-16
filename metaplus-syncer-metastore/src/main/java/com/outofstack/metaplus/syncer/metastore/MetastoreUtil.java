@@ -4,12 +4,14 @@ import com.outofstack.metaplus.common.PropertyConfig;
 import com.outofstack.metaplus.common.json.JsonArray;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
+import com.outofstack.metaplus.common.model.search.Hits;
 import com.outofstack.metaplus.domain.TableDomain;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MetastoreUtil {
@@ -26,6 +28,31 @@ public class MetastoreUtil {
         }
         return patchlogName;
     }
+
+
+    /// max supported partitions.
+    /// if exceeded, partition information will no longer be synchronized.
+    public static final String KEY_SYNCER_MAX_SUPPORTED_PARTITIONS = "metaplus.syncer.max_supported_partitions";
+    public static final int DEFAULT_SYNCER_MAX_SUPPORTED_PARTITIONS = 10_000;
+
+    private static int maxSupportedPartitions = 0;
+    public static int getMaxSupportedPartitions() {
+        if (0 == maxSupportedPartitions) {
+            String value = PropertyConfig.get(KEY_SYNCER_MAX_SUPPORTED_PARTITIONS);
+            if (null != value && !value.isEmpty()) {
+                try {
+                    maxSupportedPartitions = Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    // print warn log
+                }
+            }
+        }
+        if (0 == maxSupportedPartitions) {
+            maxSupportedPartitions = DEFAULT_SYNCER_MAX_SUPPORTED_PARTITIONS;
+        }
+        return maxSupportedPartitions;
+    }
+
 
 
     public static JsonArray packColumns(List<FieldSchema> fields) {
@@ -47,7 +74,7 @@ public class MetastoreUtil {
                 partitionKeys.append(fs.getName());
                 first = false;
             } else {
-                partitionKeys.append("/");
+                partitionKeys.append(",");
                 partitionKeys.append(fs.getName());
             }
         }
@@ -134,4 +161,13 @@ public class MetastoreUtil {
         return partDoc;
     }
 
+    public static List<String> unpackPartitionsFromHits(Hits hits) {
+        int size = hits.getHitsSize();
+        List<String> partitions = new ArrayList<>(size);
+        for (int i=0; i < size; i++) {
+            JsonObject it = hits.getHitsItem(i);
+            partitions.add(it.getJsonObject("meta").getString("partitionValues"));
+        }
+        return partitions;
+    }
 }
