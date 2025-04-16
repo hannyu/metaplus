@@ -13,18 +13,19 @@ public class DomainTest {
 
         HttpResponse<JsonObject> response;
         DomainDoc tableDomain = DefinedDomains.getDefinedDomain(TableDomain.DOMAIN_TABLE);
-        mpclient.domainDelete(tableDomain.getFqmnName(), tableDomain);
-
+//        mpclient.domainDelete(tableDomain.getFqmnName(), tableDomain);
         response = mpclient.domainCreate(tableDomain.getFqmnName(), tableDomain);
         System.out.println("response: " + response);
 
         DomainDoc tableColumnDomain = DefinedDomains.getDefinedDomain(TableDomain.DOMAIN_TABLE_COLUMN);
-        mpclient.domainDelete(tableColumnDomain.getFqmnName(), tableColumnDomain);
-
+//        mpclient.domainDelete(tableColumnDomain.getFqmnName(), tableColumnDomain);
         response = mpclient.domainCreate(tableColumnDomain.getFqmnName(), tableColumnDomain);
         System.out.println("response: " + response);
 
         DomainDoc tablePartitionDomain = DefinedDomains.getDefinedDomain(TableDomain.DOMAIN_TABLE_PARTITION);
+//        mpclient.domainDelete(tablePartitionDomain.getFqmnName(), tablePartitionDomain);
+        response = mpclient.domainCreate(tablePartitionDomain.getFqmnName(), tablePartitionDomain);
+        System.out.println("response: " + response);
 
     }
 }

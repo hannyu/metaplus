@@ -7,6 +7,7 @@ import com.outofstack.metaplus.common.model.DomainDoc;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
 import com.outofstack.metaplus.common.model.MetaplusPatch;
 import com.outofstack.metaplus.common.model.search.Hits;
+import com.outofstack.metaplus.common.model.search.Query;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -64,6 +65,7 @@ public class MetaplusClient {
         ResponseEntity<JsonObject> response = restClient.post()
                 .uri("/echo/%s".formatted(name))
                 .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(requestBody)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
@@ -191,6 +193,18 @@ public class MetaplusClient {
         ResponseEntity<JsonObject> response = restClient.get()
                 .uri("/query/simple_search/%s/%s".formatted(domains, queryText))
                 .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
+                .toEntity(JsonObject.class);
+        return new HttpResponse<Hits>(response.getBody(), Hits.class);
+    }
+
+    public HttpResponse<Hits> querySearch(String domains, Query query) {
+        ResponseEntity<JsonObject> response = restClient.method(HttpMethod.GET)
+                .uri("/query/search/%s".formatted(domains))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(query)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
                 .toEntity(JsonObject.class);
