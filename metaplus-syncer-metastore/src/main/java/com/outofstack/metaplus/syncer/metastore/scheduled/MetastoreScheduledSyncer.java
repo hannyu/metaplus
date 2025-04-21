@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class MetastoreScheduledSyncer {
 
     public static String scheduledSyncerName = "scheduled-" + PropertyConfig.getSyncerHostname();
@@ -66,7 +67,7 @@ public class MetastoreScheduledSyncer {
                         Table table = hmsclient.getTable(catalogName, dbName, tableName);
                         System.out.println("Table: " + tableName + ", Loc: " + table.getSd().getLocation());
 
-                        String fqmnName = TableDomain.packFqmnName(catalogName, dbName, tableName);
+                        String fqmnName = TableDomain.packFqmn4Table(catalogName, dbName, tableName);
                         HttpResponse<MetaplusDoc> response = mpclient.queryRead(DocUtil.packFqmn("", "table", fqmnName));
                         if (response.isNotFound()) {
                             /// create table/column/partition
@@ -140,8 +141,9 @@ public class MetastoreScheduledSyncer {
 
                         // diff partition
                         /// TODO: 搞清楚 listPartitionNames 的返回顺序？
-                        /// 假设 Metastore的返回是按分区名的字符顺序返回（并不是按添加分区的时间顺序），
+                        /// 答：Metastore的返回是按分区名的字符顺序返回（并不是按添加分区的时间顺序），
                         /// 若 分区数 大于 指定max，则会取不到最新的分区。
+
                         /// --- 不太行的方案 ---
                         /// 解决方案：一次读500，一直读，直到读完（最后一次读取返回不足500），
                         /// 取最后的0~1000条，只对这最多1000条分区做diff（时间越久远，越不重要）
@@ -154,7 +156,8 @@ public class MetastoreScheduledSyncer {
 
                         if (partitionCnt <= MetastoreUtil.getMaxSupportedPartitions()) {
                             List<String> newPartitions = hmsclient.listPartitionNames(catalogName, dbName, tableName, -1);
-                            System.out.println("newPartitions: " + JsonObject.object2JsonString(newPartitions));
+//                            System.out.println("newPartitions: " + JsonObject.object2JsonString(newPartitions));
+                            System.out.println("newPartitions: " + newPartitions.size());
 
                             Query query = new Query();
                             query.setQuery(new JsonObject("bool", new JsonObject("filter", new JsonArray()
@@ -165,22 +168,31 @@ public class MetastoreScheduledSyncer {
                             query.setSort(new JsonArray(new JsonObject("meta.partitionValues", new JsonObject("order", "asc"))));
                             query.setSource(new JsonArray("meta.partitionValues"));
                             query.setSize(10000);
+//                            System.out.println("query: " + query);
                             HttpResponse<Hits> hits = mpclient.querySearch(TableDomain.DOMAIN_TABLE_PARTITION, query);
+//                            System.out.println("hits: " + hits);
                             List<String> oldPartitions = MetastoreUtil.unpackPartitionsFromHits(hits.getBody());
-                            System.out.println("oldPartitions: " + oldPartitions);
+//                            System.out.println("oldPartitions: " + oldPartitions);
+                            System.out.println("oldPartitions: " + oldPartitions.size());
 
-                            /// TODO: here
+                            /// add partitions
+                            newPartitions.stream().filter(p -> !oldPartitions.contains(p)).forEach(p -> {
+                                MetaplusDoc partDoc = MetastoreUtil.packPartitionDoc(catalogName, dbName, tableName, p);
+                                mpclient.metaCreate(partDoc.getFqmnFqmn(), partDoc);
+                                System.out.println("create partition " + partDoc.getFqmnFqmn());
+                            });
+
+                            /// delete partitions
+                            oldPartitions.stream().filter(p -> !newPartitions.contains(p)).forEach(p -> {
+                                MetaplusDoc partDoc = MetastoreUtil.packPartitionDoc(catalogName, dbName, tableName, p);
+                                mpclient.metaDelete(partDoc.getFqmnFqmn(), partDoc);
+                                System.out.println("delete partition " + partDoc.getFqmnFqmn());
+                            });
 
                         } else {
                             System.out.println("Table has '" + partitionCnt + "' partitions, exceed MaxSupportedPartitions '" +
                                     MetastoreUtil.getMaxSupportedPartitions()+ "', so NOT sync the partition info.");
                         }
-
-//                        oldPartitions.sort();
-//                        for (int i=0; i< newPartitions.size(); i++) {
-//
-//                        }
-
                     }
                 }
             }

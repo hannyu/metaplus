@@ -113,7 +113,7 @@ public class MetastoreUtil {
 
         // produce table
         MetaplusDoc doc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE,
-                TableDomain.packFqmnName(catalogName, dbName, tableName));
+                TableDomain.packFqmn4Table(catalogName, dbName, tableName));
         JsonObject meta = doc.getMeta();
         meta.put("catalogName", catalogName);
         meta.put("dbName", dbName);
@@ -135,7 +135,7 @@ public class MetastoreUtil {
 
     public static MetaplusDoc packColumnDoc(Table table, FieldSchema fs) {
         MetaplusDoc colDoc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE_COLUMN,
-                TableDomain.packFqmnName(table.getCatName(), table.getDbName(),
+                TableDomain.packFqmn4Table(table.getCatName(), table.getDbName(),
                         table.getTableName()) + "." + fs.getName());
         JsonObject colMeta = colDoc.getMeta();
         colMeta.put("catalogName", table.getCatName());
@@ -149,15 +149,18 @@ public class MetastoreUtil {
 
     public static MetaplusDoc packPartitionDoc(Partition partition, List<FieldSchema> partitionFields) {
         String partValues = packPartitionValues(partition, partitionFields);
-        MetaplusDoc partDoc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE_PARTITION,
-                TableDomain.packFqmnName(partition.getCatName(), partition.getDbName(),
-                        partition.getTableName()) + "(" + partValues + ")");
+        return packPartitionDoc(partition.getCatName(), partition.getDbName(), partition.getTableName(), partValues);
+    }
 
+    public static MetaplusDoc packPartitionDoc(String catalogName, String dbName, String tableName,
+                                               String partitionValues) {
+        MetaplusDoc partDoc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE_PARTITION,
+                TableDomain.packFqmn4TablePartition(catalogName, dbName, tableName, partitionValues));
         JsonObject partMeta = partDoc.getMeta();
-        partMeta.put("catalogName", partition.getCatName());
-        partMeta.put("dbName", partition.getDbName());
-        partMeta.put("tableName", partition.getTableName());
-        partMeta.put("partitionValues", partValues);
+        partMeta.put("catalogName", catalogName);
+        partMeta.put("dbName", dbName);
+        partMeta.put("tableName", tableName);
+        partMeta.put("partitionValues", partitionValues);
         return partDoc;
     }
 
@@ -166,7 +169,7 @@ public class MetastoreUtil {
         List<String> partitions = new ArrayList<>(size);
         for (int i=0; i < size; i++) {
             JsonObject it = hits.getHitsItem(i);
-            partitions.add(it.getJsonObject("meta").getString("partitionValues"));
+            partitions.add(it.getStringByPath("$._source.meta.partitionValues"));
         }
         return partitions;
     }
