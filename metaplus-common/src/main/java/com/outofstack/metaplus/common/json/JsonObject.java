@@ -58,9 +58,14 @@ public class JsonObject {
     }
 
     public static String object2JsonString(Object object) {
-        return JsonProxyFactory.object2JsonString(object);
+        if (object instanceof JsonObject) {
+            return ((JsonObject)object).toJson();
+        } else if (object instanceof JsonArray) {
+            return ((JsonArray)object).toJson();
+        } else {
+            return JsonProxyFactory.object2JsonString(object);
+        }
     }
-
 
     public JsonObject toCopy() {
         JsonObject copy = new JsonObject();

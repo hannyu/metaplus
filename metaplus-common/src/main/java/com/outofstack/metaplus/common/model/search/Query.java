@@ -59,14 +59,14 @@ public class Query extends JsonObject {
     public void setFrom(int from) {
         put(KEY_FROM, from);
     }
-    public int getFrom() {
+    public Integer getFrom() {
         return getInteger(KEY_FROM);
     }
 
     public void setSize(int size) {
         put(KEY_SIZE, size);
     }
-    public int getSize() {
+    public Integer getSize() {
         return getInteger(KEY_SIZE);
     }
 

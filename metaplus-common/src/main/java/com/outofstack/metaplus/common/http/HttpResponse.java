@@ -87,7 +87,7 @@ public class HttpResponse<BodyType extends JsonObject> extends JsonObject {
     }
 
     /// ////////////////////////////////
-    /// common final http response
+    /// some final http response
     /// ////////////////////////////////
 
     private static final HttpResponse<JsonObject> OK = new HttpResponse<JsonObject>(200, "ok");
