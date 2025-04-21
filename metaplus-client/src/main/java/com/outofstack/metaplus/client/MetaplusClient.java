@@ -15,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 public class MetaplusClient {
 
     private final RestClient restClient;
@@ -63,7 +66,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> echo(String name, JsonObject requestBody) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/echo/%s".formatted(name))
+                .uri("/echo/{name}", name)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(requestBody)
@@ -79,7 +82,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> metaCreate(String fqmn, MetaplusDoc doc) {
         ResponseEntity<JsonObject> response = restClient.put()
-                .uri("/meta/create/%s".formatted(fqmn))
+                .uri("/meta/create/{fqmn}", fqmn)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(doc)
@@ -91,7 +94,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> metaUpdate(String fqmn, MetaplusDoc doc) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/meta/update/%s".formatted(fqmn))
+                .uri("/meta/update/{fqmn}", fqmn)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(doc)
@@ -103,7 +106,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> metaDelete(String fqmn, MetaplusDoc doc) {
         ResponseEntity<JsonObject> response = restClient.method(HttpMethod.DELETE)
-                .uri("/meta/delete/%s".formatted(fqmn))
+                .uri("/meta/delete/{fqmn}", fqmn)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(doc)
@@ -115,7 +118,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> plusUpdate(String fqmn, MetaplusDoc doc) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/plus/update/%s".formatted(fqmn))
+                .uri("/plus/update/{fqmn}", fqmn)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(doc)
@@ -127,7 +130,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> patchUpdate(String domain, MetaplusPatch patch) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/patch/update/%s".formatted(domain))
+                .uri("/patch/update/{domain}", domain)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(patch)
@@ -139,7 +142,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> patchDelete(String domain, MetaplusPatch patch) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/patch/delete/%s".formatted(domain))
+                .uri("/patch/delete/{domain}", domain)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(patch)
@@ -156,7 +159,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> syncOne(MetaplusPatch patch) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/sync/one/%s".formatted(patch.getDomain()))
+                .uri("/sync/one/{domain}", patch.getDomain())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(patch)
@@ -172,7 +175,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> queryExist(String fqmn) {
         ResponseEntity<JsonObject> response = restClient.head()
-                .uri("/query/exist/%s".formatted(fqmn))
+                .uri("/query/exist/{fqmn}", fqmn)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
                 .toEntity(JsonObject.class);
@@ -181,7 +184,7 @@ public class MetaplusClient {
 
     public HttpResponse<MetaplusDoc> queryRead(String fqmn) {
         ResponseEntity<JsonObject> response = restClient.get()
-                .uri("/query/read/%s".formatted(fqmn))
+                .uri("/query/read/{fqmn}", fqmn)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
@@ -191,7 +194,7 @@ public class MetaplusClient {
 
     public HttpResponse<Hits> querySimpleSearch(String domains, String queryText) {
         ResponseEntity<JsonObject> response = restClient.get()
-                .uri("/query/simple_search/%s/%s".formatted(domains, queryText))
+                .uri("/query/simple_search/{domains}/{queryText}", domains, queryText)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
@@ -201,7 +204,7 @@ public class MetaplusClient {
 
     public HttpResponse<Hits> querySearch(String domains, Query query) {
         ResponseEntity<JsonObject> response = restClient.method(HttpMethod.GET)
-                .uri("/query/search/%s".formatted(domains))
+                .uri("/query/search/{domains}", domains)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(query)
@@ -217,7 +220,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> domainCreate(String domain, DomainDoc domainDoc) {
         ResponseEntity<JsonObject> response = restClient.put()
-                .uri("/domain/create/%s".formatted(domain))
+                .uri("/domain/create/{domain}", domain)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(domainDoc)
@@ -229,7 +232,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> domainUpdate(String domain, DomainDoc domainDoc) {
         ResponseEntity<JsonObject> response = restClient.post()
-                .uri("/domain/update/%s".formatted(domain))
+                .uri("/domain/update/{domain}", domain)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(domainDoc)
@@ -241,7 +244,7 @@ public class MetaplusClient {
 
     public HttpResponse<JsonObject> domainDelete(String domain, DomainDoc domainDoc) {
         ResponseEntity<JsonObject> response = restClient.method(HttpMethod.DELETE)
-                .uri("/domain/delete/%s".formatted(domain))
+                .uri("/domain/delete/{domain}", domain)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(domainDoc)
@@ -253,7 +256,7 @@ public class MetaplusClient {
 
     public HttpResponse<MetaplusDoc> domainSample(String domain) {
         ResponseEntity<JsonObject> response = restClient.get()
-                .uri("/domain/sample/%s".formatted(domain))
+                .uri("/domain/sample/{domain}", domain)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {/**/})
