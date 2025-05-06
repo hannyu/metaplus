@@ -1,29 +1,21 @@
-package com.outofstack.metaplus.common;
+package com.outofstack.metaplus.common.lang;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class LangUtil {
 
     /**
-     * joinString(["a", "b", "c"], ":") -> "a:b:c"
+     * diffOrderedList(left, right) ==> [onlyInLeft, onlyInRight]
      *
+     * @param leftOrderedList
+     * @param rightOrderedList
+     * @param comparator
+     * @return
+     * @param <T>
      */
-    public static String join(List<String> strList, String delimiter) {
-        StringJoiner sj = new StringJoiner(delimiter);
-        for (String str : strList) {
-            sj.add(str);
-        }
-        return sj.toString();
-    }
-
-    /**
-     *
-     *
-     */
-    public static <T> List<List<T>> diffOrderedList(List<T> leftOrderedList, List<T> rightOrderedList,
+    public static <T> Pair<List<T>, List<T>> diffOrderedList(List<T> leftOrderedList, List<T> rightOrderedList,
                                              Comparator<T> comparator) {
         int i = 0, j = 0;
         List<T> onlyInLeft = new ArrayList<>();
@@ -44,9 +36,6 @@ public class LangUtil {
         while (i < leftOrderedList.size()) onlyInLeft.add(leftOrderedList.get(i++));
         while (j < rightOrderedList.size()) onlyInRight.add(rightOrderedList.get(j++));
 
-        List<List<T>> res = new ArrayList<>();
-        res.add(onlyInLeft);
-        res.add(onlyInRight);
-        return res;
+        return new Pair<>(onlyInLeft, onlyInRight);
     }
 }
