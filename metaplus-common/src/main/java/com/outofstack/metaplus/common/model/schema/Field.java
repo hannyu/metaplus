@@ -50,7 +50,7 @@ public class Field extends JsonObject {
     }
 
     private void checkAndLoad() {
-        Object v = get(KEY_TYPE);
+        Object v = getObject(KEY_TYPE);
         if (! (v instanceof String)) {
             throw new IllegalArgumentException("A Field must have a valid 'type'");
         }
@@ -103,7 +103,7 @@ public class Field extends JsonObject {
         put(KEY_REQUIRED, required);
     }
     public Object getDefault() {
-        return get(KEY_DEFAULT);
+        return getObject(KEY_DEFAULT);
     }
     public void setDefault(Object defaultValue) {
         put(KEY_DEFAULT, defaultValue);

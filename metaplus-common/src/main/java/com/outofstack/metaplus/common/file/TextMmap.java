@@ -8,6 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+/**
+ * Simulating mmap to Implement File Mapping
+ */
 public class TextMmap {
 
     private final MappedByteBuffer mappedBuffer;

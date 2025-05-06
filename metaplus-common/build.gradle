@@ -9,7 +9,16 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 dependencies {
+
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+
     compileOnly("org.springframework:spring-web:$springweb_version")
     compileOnly("com.alibaba.fastjson2:fastjson2:$fastjson2_version")
     compileOnly("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
@@ -17,8 +26,8 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("com.alibaba.fastjson2:fastjson2:$fastjson2_version")
-//    testImplementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
+//    testImplementation("com.alibaba.fastjson2:fastjson2:$fastjson2_version")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
 }
 
 tasks.test {

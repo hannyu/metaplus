@@ -26,7 +26,7 @@ public class Properties extends JsonObject {
         }
 
         for (String key : properties.keySet()) {
-            Object v = properties.get(key);
+            Object v = properties.getObject(key);
             if (!(v instanceof JsonObject)) {
                 throw new IllegalArgumentException("A Properties key '" + key + "' has a valid value '" + v + "'");
             } else {

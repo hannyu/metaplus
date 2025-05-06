@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TextMmapTest {
 
     @Test
@@ -15,11 +17,12 @@ public class TextMmapTest {
         System.out.println("tmppath: " + tmppath);
 
         TextMmap textmmap = new TextMmap(tmppath, 100);
-        for (int i=0; i<1000; i++) {
+        for (int i=0; i<10; i++) {
             textmmap.setText("id: " + i);
             Thread.sleep(10);
         }
 
         System.out.println("finally: " + textmmap.getText());
+        assertEquals("id: 9", textmmap.getText());
     }
 }

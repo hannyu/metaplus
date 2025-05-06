@@ -46,7 +46,7 @@ public class Query extends JsonObject {
         put(KEY_SOURCE, source);
     }
     public Object getSource() {
-        return get(KEY_SOURCE);
+        return getObject(KEY_SOURCE);
     }
 
     public void setSort(JsonArray sort) {

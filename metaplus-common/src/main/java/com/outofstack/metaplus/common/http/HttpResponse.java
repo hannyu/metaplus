@@ -2,6 +2,7 @@ package com.outofstack.metaplus.common.http;
 
 import com.outofstack.metaplus.common.json.JsonObject;
 
+
 public class HttpResponse<BodyType extends JsonObject> extends JsonObject {
     public static final String KEY_CODE = "code";
     public static final String KEY_MSG = "msg";
@@ -90,14 +91,18 @@ public class HttpResponse<BodyType extends JsonObject> extends JsonObject {
     /// some final http response
     /// ////////////////////////////////
 
-    private static final HttpResponse<JsonObject> OK = new HttpResponse<JsonObject>(200, "ok");
     public static HttpResponse<JsonObject> ok() {
-        return OK;
+        return new HttpResponse<JsonObject>(200, "ok");
+    }
+    public static <BodyType extends JsonObject> HttpResponse<BodyType> ok(BodyType body) {
+        return new HttpResponse<BodyType>(200, "ok", body);
     }
 
-    private static final HttpResponse<JsonObject> NOT_FOUND = new HttpResponse<JsonObject>(404, "not found");
     public static HttpResponse<JsonObject> notFound() {
-        return NOT_FOUND;
+        return new HttpResponse<JsonObject>(404, "not found");
+    }
+    public static <BodyType extends JsonObject> HttpResponse<BodyType> notFound(BodyType body) {
+        return new HttpResponse<BodyType>(404, "not found", body);
     }
 
 }

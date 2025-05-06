@@ -1,6 +1,8 @@
 package com.outofstack.metaplus.common;
 
 import com.outofstack.metaplus.common.json.JsonObject;
+import com.outofstack.metaplus.common.lang.LangUtil;
+import com.outofstack.metaplus.common.lang.Pair;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class LangUtilTest {
         list2.add("ddd");
         list2.add("eee");
 
-        List<List<String>> difs = LangUtil.diffOrderedList(list1, list2, String::compareTo);
+        Pair<List<String>, List<String>> difs = LangUtil.diffOrderedList(list1, list2, String::compareTo);
         System.out.println("difs: " + JsonObject.object2JsonString(difs));
     }
 }
