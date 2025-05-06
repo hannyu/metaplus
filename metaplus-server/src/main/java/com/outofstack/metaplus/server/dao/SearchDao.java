@@ -1,6 +1,5 @@
 package com.outofstack.metaplus.server.dao;
 
-import com.outofstack.metaplus.common.LangUtil;
 import com.outofstack.metaplus.common.model.search.Hits;
 import com.outofstack.metaplus.common.model.search.Query;
 import com.outofstack.metaplus.server.MetaplusException;
@@ -15,7 +14,7 @@ public class SearchDao extends AbstractDao {
 
     public Hits query(List<String> domains, Query query) {
         List<String> indexNames = batchDomain2IndexName(domains);
-        String url = "/%s/_search?version=true".formatted(LangUtil.join(indexNames, ","));
+        String url = "/%s/_search?version=true".formatted(String.join(",", indexNames));
 
         EsResponse response = esClient.get(url, query);
         if (!response.isSuccess()) {

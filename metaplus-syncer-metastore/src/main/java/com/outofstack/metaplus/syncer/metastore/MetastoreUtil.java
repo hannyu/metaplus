@@ -113,7 +113,7 @@ public class MetastoreUtil {
 
         // produce table
         MetaplusDoc doc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE,
-                TableDomain.packFqmn4Table(catalogName, dbName, tableName));
+                TableDomain.packTableFqmn(catalogName, dbName, tableName));
         JsonObject meta = doc.getMeta();
         meta.put("catalogName", catalogName);
         meta.put("dbName", dbName);
@@ -135,7 +135,7 @@ public class MetastoreUtil {
 
     public static MetaplusDoc packColumnDoc(Table table, FieldSchema fs) {
         MetaplusDoc colDoc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE_COLUMN,
-                TableDomain.packFqmn4Table(table.getCatName(), table.getDbName(),
+                TableDomain.packTableFqmn(table.getCatName(), table.getDbName(),
                         table.getTableName()) + "." + fs.getName());
         JsonObject colMeta = colDoc.getMeta();
         colMeta.put("catalogName", table.getCatName());
@@ -155,7 +155,7 @@ public class MetastoreUtil {
     public static MetaplusDoc packPartitionDoc(String catalogName, String dbName, String tableName,
                                                String partitionValues) {
         MetaplusDoc partDoc = new MetaplusDoc(PropertyConfig.getFqmnCorp(), TableDomain.DOMAIN_TABLE_PARTITION,
-                TableDomain.packFqmn4TablePartition(catalogName, dbName, tableName, partitionValues));
+                TableDomain.packTablePartitionFqmn(catalogName, dbName, tableName, partitionValues));
         JsonObject partMeta = partDoc.getMeta();
         partMeta.put("catalogName", catalogName);
         partMeta.put("dbName", dbName);

@@ -110,12 +110,12 @@ public abstract class AbstractService {
     void validateAndFixupByRules(MetaplusDoc doc) {
         List<JsonRule> docRules = domainLib.getRules(doc.getFqmnDomain());
         for (JsonRule jsonRule : docRules) {
-            if (null != jsonRule.getDefault()) {
-                if (null == doc.getByPath(jsonRule.getJsonPath())) {
-                    doc.putByPath(jsonRule.getJsonPath(), jsonRule.getDefault());
+            if (null != jsonRule.getDefaultValue()) {
+                if (!doc.containsByPath(jsonRule.getJsonPath())) {
+                    doc.putByPath(jsonRule.getJsonPath(), jsonRule.getDefaultValue());
                 }
             } else if (jsonRule.getRequired()) {
-                if (null == doc.getByPath(jsonRule.getJsonPath())) {
+                if (!doc.containsByPath(jsonRule.getJsonPath())) {
                     throw new MetaplusException("JsonRule validate fail, '" + jsonRule.getJsonPath() +
                             "' is required in doc");
                 }

@@ -11,9 +11,6 @@ public abstract class AbstractDao {
     @Autowired
     protected DomainLib domainLib;
 
-    /// ///////////
-    ///
-
 
 
     public static final String SCRIPT_FUNC_MERGE =

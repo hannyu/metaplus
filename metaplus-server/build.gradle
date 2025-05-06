@@ -9,14 +9,14 @@ apply plugin: 'io.spring.dependency-management'
 group = "com.outofstack.metaplus"
 version = "$metaplus_version"
 
+repositories {
+    mavenCentral()
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -25,9 +25,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.httpcomponents.client5:httpclient5")
 
-    implementation 'org.slf4j:slf4j-api:2.0.17'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    implementation "org.slf4j:slf4j-api:$slf4j_version"
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

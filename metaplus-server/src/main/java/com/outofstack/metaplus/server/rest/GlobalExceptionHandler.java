@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<JsonObject> catchException(Throwable e) {
         log.warn("Catch exception in RestController", e);
-        System.out.println("Catch exception in RestController, " + e.getMessage());
+        System.err.println("Catch exception in RestController, " + e.getMessage());
 
         if (e instanceof IllegalArgumentException || e instanceof MetaplusException) {
             return ResponseEntity.badRequest().body(

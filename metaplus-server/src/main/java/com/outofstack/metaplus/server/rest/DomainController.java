@@ -55,7 +55,7 @@ public class DomainController {
     @GetMapping("/read/{domain}")
     public HttpResponse<DomainDoc> read(@PathVariable String domain) {
         DomainDoc domainDoc = domainService.readDomain(domain);
-        return new HttpResponse<DomainDoc>(200, domainDoc);
+        return HttpResponse.ok(domainDoc);
     }
 
     @RequestMapping("/exist/{domain}")
@@ -70,14 +70,13 @@ public class DomainController {
     @GetMapping("/sample/{domain}")
     public HttpResponse<MetaplusDoc> sample(@PathVariable String domain) {
         MetaplusDoc doc = domainService.sample(domain);
-        return new HttpResponse<MetaplusDoc>(200, doc);
+        return HttpResponse.ok(doc);
     }
 
     @GetMapping("/list")
     public HttpResponse<JsonObject> list() {
         Set<String> domains = domainService.listDomains();
-        return new HttpResponse<JsonObject>(200,
-                new JsonObject("domains", new JsonArray().addAll(domains.toArray())));
+        return HttpResponse.ok(new JsonObject("domains", new JsonArray().addAll(domains.toArray())));
     }
 
 }

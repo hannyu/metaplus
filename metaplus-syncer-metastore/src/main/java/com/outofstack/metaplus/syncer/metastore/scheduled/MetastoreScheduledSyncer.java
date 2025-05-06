@@ -15,14 +15,8 @@ import com.outofstack.metaplus.syncer.metastore.MetastoreUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.api.PartitionsByExprRequest;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
-import org.apache.thrift.TException;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -67,7 +61,7 @@ public class MetastoreScheduledSyncer {
                         Table table = hmsclient.getTable(catalogName, dbName, tableName);
                         System.out.println("Table: " + tableName + ", Loc: " + table.getSd().getLocation());
 
-                        String fqmnName = TableDomain.packFqmn4Table(catalogName, dbName, tableName);
+                        String fqmnName = TableDomain.packTableFqmn(catalogName, dbName, tableName);
                         HttpResponse<MetaplusDoc> response = mpclient.queryRead(DocUtil.packFqmn("", "table", fqmnName));
                         if (response.isNotFound()) {
                             /// create table/column/partition

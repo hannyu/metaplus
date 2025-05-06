@@ -1,6 +1,7 @@
 package com.outofstack.metaplus.server.dao;
 
 import com.outofstack.metaplus.common.TimeUtil;
+import com.outofstack.metaplus.common.lang.Tuple3;
 import com.outofstack.metaplus.common.json.JsonArray;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.json.JsonRule;
@@ -256,11 +257,13 @@ public class DomainLib {
         return richSchema;
     }
 
-    public SchemaTuple generateSchemaTuple(DomainDoc domainDoc) {
+    /**
+     * Tuple3 < origSchema, richSchema, pureSchema >
+     */
+    public Tuple3<Schema, Schema, Schema> generateSchemaTuple(DomainDoc domainDoc) {
         Schema richSchema = buildRichSchemaFromDomainDocRecursively(domainDoc);
         Schema pureSchema = rich2PureSchema(richSchema);
-//        List<JsonRule> rules = buildJsonRules(richSchema.getMappings());
-        return new SchemaTuple(domainDoc.getSchema(), richSchema, pureSchema);
+        return new Tuple3<>(domainDoc.getSchema(), richSchema, pureSchema);
     }
 
     public Schema rich2PureSchema(Schema richSchema) {
@@ -336,7 +339,7 @@ public class DomainLib {
                 }
                 buildSampleRecursively(child, new Properties(property));
             } else if (Field.isField(property)) {
-                if (null == sample.get(key)) {
+                if (null == sample.getObject(key)) {
                     Field field = new Field(property);
                     String type = field.getType();
                     Object oDefault = field.getDefault();

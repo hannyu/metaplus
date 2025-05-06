@@ -41,14 +41,14 @@ public class QueryController {
     @GetMapping("/simple_search/{domains}/{queryText}")
     public HttpResponse<Hits> simpleSearch(@PathVariable String domains, @PathVariable String queryText) {
         Hits hits = queryService.simpleSearch(domains, queryText);
-        return new HttpResponse<Hits>(200, hits);
+        return HttpResponse.ok(hits);
     }
 
 
     @GetMapping("/search/{domains}")
     public HttpResponse<Hits> search(@PathVariable String domains, @RequestBody JsonObject requestBody) {
         Hits hits = queryService.search(domains, new Query(requestBody));
-        return new HttpResponse<Hits>(200, hits);
+        return HttpResponse.ok(hits);
     }
 
 

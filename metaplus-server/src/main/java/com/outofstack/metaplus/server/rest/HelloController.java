@@ -15,18 +15,16 @@ public class HelloController {
 
     @GetMapping({"/", "/hello"})
     public HttpResponse<JsonObject> hello(@RequestParam(value="name", defaultValue="buddy") String name) {
-        return new HttpResponse<JsonObject>(200,
-                new JsonObject("say", "(" + counter.incrementAndGet() + ") Hey " + name + ", is everything okay?"));
+        return HttpResponse.ok(new JsonObject("say",
+                "(" + counter.incrementAndGet() + ") Hey " + name + ", is everything okay?"));
     }
 
 
     @PostMapping({"/hello/echo/{name}", "/echo"})
     public HttpResponse<JsonObject> echo(@PathVariable(name = "name", required = false) String name,
                                          @RequestBody JsonObject requestBody) {
-        return new HttpResponse<JsonObject>(200,
-                new JsonObject("reply", "(" + counter.incrementAndGet() + ") Hey " +
-                        (null!=name?name:"buddy") + ", I got your post.")
-                        .put("your_post", requestBody));
+        return HttpResponse.ok(new JsonObject("reply", "(" + counter.incrementAndGet() + ") Hey " +
+                (null!=name?name:"buddy") + ", I got your post.").put("your_post", requestBody));
     }
 
     @GetMapping("/wrong")

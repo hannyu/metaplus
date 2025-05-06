@@ -1,5 +1,6 @@
 package com.outofstack.metaplus.server.service;
 
+import com.outofstack.metaplus.common.lang.Tuple3;
 import com.outofstack.metaplus.common.json.JsonObject;
 import com.outofstack.metaplus.common.model.DomainDoc;
 import com.outofstack.metaplus.common.model.MetaplusDoc;
@@ -8,18 +9,15 @@ import com.outofstack.metaplus.common.model.schema.Schema;
 import com.outofstack.metaplus.server.MetaplusException;
 import com.outofstack.metaplus.server.dao.DomainLib;
 
-import com.outofstack.metaplus.server.dao.SchemaTuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+@Slf4j
 @Component
 public class DomainService extends AbstractService{
-
-    private static final Logger log = LoggerFactory.getLogger(DomainService.class);
 
     @Autowired
     private MetaService metaService;
@@ -39,17 +37,17 @@ public class DomainService extends AbstractService{
         String indexName = DomainLib.PREFIX_INDEX + domainDoc.getFqmnName();
         domainDoc.putByPath("$.meta.index.name", indexName);
         validateAndFixupByRules(domainDoc);
-        SchemaTuple schemaTuple = domainLib.generateSchemaTuple(domainDoc);
+        Tuple3<Schema, Schema, Schema> schemaTuple = domainLib.generateSchemaTuple(domainDoc);
 
         // 4. create index
         Boolean isAbstract = domainDoc.getBooleanByPath("$.meta.index.abstract");
         if (null == isAbstract || !isAbstract) {
-            indexDao.createIndex(indexName, schemaTuple.getPureSchema());
+            indexDao.createIndex(indexName, schemaTuple.getT3());
             domainDoc.putByPath("$.meta.index.created", true);
         }
 
         // 5. create doc
-        domainDoc.setSchema(schemaTuple.getRichSchema());
+        domainDoc.setSchema(schemaTuple.getT2());
         metaService.create(domainDoc);
         domainLib.putDomainDoc(name, domainDoc);
     }
