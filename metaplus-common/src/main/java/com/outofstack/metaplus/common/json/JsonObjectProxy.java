@@ -10,7 +10,7 @@ public interface JsonObjectProxy {
     boolean isEmpty();
     Set<String> keySet();
     boolean containsKey(String key);
-    Object get(String key);
+    Object getObject(String key);
     String getString(String key);
     Long getLong(String key);
     Integer getInteger(String key);

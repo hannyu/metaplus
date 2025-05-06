@@ -81,7 +81,7 @@ public class JsonObjectProxy4Fastjson2 implements JsonObjectProxy {
     }
 
     @Override
-    public Object get(String key) {
+    public Object getObject(String key) {
         Object v = jo.get(key);
         if (v instanceof JSONObject) {
             return new JsonObjectProxy4Fastjson2((JSONObject) v);

@@ -1,6 +1,9 @@
 package com.outofstack.metaplus.common.json;
 
 
+import lombok.Data;
+
+@Data
 public class JsonRule {
 
     private String jsonPath;
@@ -33,42 +36,21 @@ public class JsonRule {
         this(jsonPath, comment, false);
     }
 
-    @Override
-    public String toString() {
-        return "JsonRule jsonPath=" + jsonPath + ", comment=" + comment + ", required=" + required +
-                ", default=" + defaultValue + ".";
-    }
+//    public void enforce(JsonObject target) {
+//        if (null == target) {
+//            throw new JsonException("JsonRule fail, target is null");
+//        }
+//        if (null != defaultValue) {
+//            Object value = target.getByPath(jsonPath);
+//            if (null == value) {
+//                target.putByPath(jsonPath, defaultValue);
+//            }
+//        } else if (required) {
+//            Object value = target.getByPath(jsonPath);
+//            if (null == value) {
+//                throw new JsonException("JsonRule fail, '" + jsonPath + "' is required");
+//            }
+//        }
+//    }
 
-    public void enforce(JsonObject target) {
-        if (null == target) {
-            throw new JsonException("JsonRule fail, target is null");
-        }
-        if (null != defaultValue) {
-            Object value = target.getByPath(jsonPath);
-            if (null == value) {
-                target.putByPath(jsonPath, defaultValue);
-            }
-        } else if (required) {
-            Object value = target.getByPath(jsonPath);
-            if (null == value) {
-                throw new JsonException("JsonRule fail, '" + jsonPath + "' is required");
-            }
-        }
-    }
-
-    public String getJsonPath() {
-        return jsonPath;
-    }
-    public String getComment() {
-        return comment;
-    }
-    public Boolean getRequired() {
-        return required;
-    }
-    public Object getDefault() {
-        return defaultValue;
-    }
-    public Object[] getSamples() {
-        return samples;
-    }
 }

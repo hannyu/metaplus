@@ -69,25 +69,29 @@ public class JsonArrayProxy4Jackson implements JsonArrayProxy {
     }
 
     @Override
-    public Object get(int idx) {
+    public Object getObject(int idx) {
         try {
             JsonNode v = an.get(idx);
             if (null == v || v.isNull()) {
                 return null;
-            } else if (v.isLong()) {
-                return v.asLong();
-            } else if (v.isInt() || v.isShort()) {
-                return v.asInt();
-            } else if (v.isDouble() || v.isFloat()) {
-                return v.asDouble();
-            } else if (v.isBoolean()) {
-                return v.asBoolean();
-            } else if (v.isTextual()) {
-                return v.asText();
             } else if (v.isObject()) {
                 return new JsonObjectProxy4Jackson((ObjectNode) v);
             } else if (v.isArray()) {
                 return new JsonArrayProxy4Jackson((ArrayNode) v);
+            } else if (v.isTextual()) {
+                return v.textValue();
+            } else if (v.isInt()) {
+                return v.intValue();
+            } else if (v.isLong()) {
+                return v.longValue();
+            } else if (v.isShort()) {
+                return v.shortValue();
+            } else if (v.isDouble()) {
+                return v.doubleValue();
+            } else if (v.isFloat()) {
+                return v.floatValue();
+            } else if (v.isBoolean()) {
+                return v.booleanValue();
             } else {
                 return v.toString();
             }

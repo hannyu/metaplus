@@ -2,6 +2,7 @@ package com.outofstack.metaplus.common.json;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,8 +17,9 @@ class JsonObjectTest {
         JsonObject jo = JsonObject.parse(json1);
         assertEquals(json1, jo.toJson());
         assertEquals(123, jo.getInteger("id"));
+        assertEquals(123, (int) jo.get("id"));
         assertEquals("han", jo.getString("name"));
-        assertEquals(123, jo.get("id"));
+        assertEquals(123, jo.getObject("id"));
 //        System.out.println("id:" + jo.get("id"));
         assertEquals(123.0d, jo.getDouble("id"));
         assertEquals(175.3f, jo.getFloat("height"));
@@ -101,7 +103,7 @@ class JsonObjectTest {
 
         jo1 = JsonObject.parse("{\"number\":5,\"duck\":[\"gaga\",\"haha\"],\"45\":32}");
         System.out.println(jo1);
-        assertNull(jo1.get("46"));
+        assertNull(jo1.getObject("46"));
 
         assertThrows(JsonException.class, () -> {
             JsonObject jo = JsonObject.parse("{\"number\":5,\"duck\":[\"gaga\",\"haha\"],45:32}");
@@ -134,12 +136,15 @@ class JsonObjectTest {
         assertEquals("jj", jo4.getJsonObject("attr").getString("aa"));
         assertEquals("bb", jo5.getJsonObject("attr").getString("aa"));
 
+        JsonObject attr = jo5.get("attr");
+        assertEquals("bb", attr.get("aa"));
+
         JsonObject jo6 = JsonObject.parse("{\"num\":5,\"duck\":[{\"j\":\"gaga\"}],\"x\":{\"y\":{\"z\":9}}}");
         JsonObject jo7 = JsonObject.parse("{\"duck\":[2,3],\"x\":{\"y\":{\"h\":10}}}");
         jo6.copyMerge(jo7);
         jo6.putByPath("$.x.y.h", 11);
         assertEquals("{\"num\":5,\"duck\":[2,3],\"x\":{\"y\":{\"z\":9,\"h\":11}}}", jo6.toJson());
-        assertEquals(10, jo7.getByPath("$.x.y.h"));
+        assertEquals(10, (Integer) jo7.getByPath("$.x.y.h"));
         System.out.println(jo6);
         System.out.println(jo7);
     }
@@ -153,7 +158,7 @@ class JsonObjectTest {
                 "\"nested\":[{},{},{\"yes\":[{},{\"no\":5}]}]}");
         assertEquals("bb", jo1.getByPath("$.attr.aa"));
         jo1.putByPath("$.x.y.z", 555);
-        assertEquals(555, jo1.getByPath("$.x.y.z"));
+        assertEquals(555, (Integer) jo1.getByPath("$.x.y.z"));
 
         assertThrows(JsonException.class, () -> {
             jo1.putByPath("$.duck.yes", "no");
@@ -171,9 +176,7 @@ class JsonObjectTest {
 
         assertEquals(5, jo1.getIntegerByPath("$.nested[2].yes[1].no"));
 
-        assertThrows(Exception.class, () -> {
-            jo1.getStringByPath("$.duck[5]");
-        });
+        assertNull(jo1.getStringByPath("$.duck[5]"));
 
     }
 
@@ -195,6 +198,7 @@ class JsonObjectTest {
             super(target);
         }
     }
+
     @Test
     public void testTen() {
         // generics
@@ -204,6 +208,32 @@ class JsonObjectTest {
         System.out.println("MyObject: " + obj);
     }
 
+    @Test
+    public void testEleven() {
+        // generics
+        JsonObject jo1 = JsonObject.parse("{\"num\":5,\"attr\":{\"aa\":\"bb\"}}");
 
+        int num = jo1.get("num");
+        System.out.println("num: " + num);
+
+        JsonObject attr = jo1.get("attr");
+        System.out.println("attr: " + attr);
+
+        float f = jo1.get("num");
+        System.out.println("f: " + f);
+
+        Object obj = jo1.get("attr");
+        System.out.println("obj: " + obj);
+
+        if (null == jo1.get("attr2")) {
+            System.out.println("== null");
+        } else {
+            System.out.println("!= null");
+        }
+
+        BigInteger big = new BigInteger(jo1.getString("num"));
+        System.out.println("big: " + big);
+
+    }
 
 }

@@ -2,9 +2,6 @@ package com.outofstack.metaplus.common.json;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class JsonArray {
     protected JsonArrayProxy jap;
@@ -36,7 +33,7 @@ public class JsonArray {
         JsonArray copy = new JsonArray();
         int size = size();
         for (int i=0; i < size; i++) {
-            Object value = get(i);
+            Object value = getObject(i);
             copy.add(value);
         }
         return copy;
@@ -46,7 +43,7 @@ public class JsonArray {
         JsonArray copy = new JsonArray();
         int size = size();
         for (int i=0; i < size; i++) {
-            Object value = get(i);
+            Object value = getObject(i);
             if (value instanceof JsonObject) {
                 copy.add(((JsonObject) value).deepCopy());
             } else if (value instanceof JsonArray) {
@@ -88,8 +85,35 @@ public class JsonArray {
         return jap.isEmpty();
     }
 
-    public Object get(int idx) {
-        Object v = jap.get(idx);
+    @SuppressWarnings("unchecked")
+    public <T> T get(int idx, T... reified) {
+        if (reified.length > 0) throw new IllegalArgumentException("`reified` should be empty.");
+
+        Class<?> rt = reified.getClass().getComponentType();
+        if (rt.equals(JsonObjectProxy.class)) {
+            return (T) getJsonObject(idx);
+        } else if (rt.equals(JsonArray.class)) {
+            return (T) getJsonArray(idx);
+        } else if (rt.equals(String.class)) {
+            return (T) getString(idx);
+        } else if (rt.equals(Integer.class)) {
+            return (T) getInteger(idx);
+        } else if (rt.equals(Long.class)) {
+            return (T) getLong(idx);
+        } else if (rt.equals(Short.class)) {
+            return (T) getShort(idx);
+        } else if (rt.equals(Double.class)) {
+            return (T) getDouble(idx);
+        } else if (rt.equals(Float.class)) {
+            return (T) getFloat(idx);
+        } else if (rt.equals(Boolean.class)) {
+            return (T) getBoolean(idx);
+        }
+        return (T) getObject(idx);
+    }
+
+    public Object getObject(int idx) {
+        Object v = jap.getObject(idx);
         if (v instanceof JsonObjectProxy) {
             return new JsonObject((JsonObjectProxy) v);
         } else if (v instanceof JsonArrayProxy) {
@@ -197,7 +221,7 @@ public class JsonArray {
     public JsonArray addAll(JsonArray jsonArray) {
         int size = jsonArray.size();
         for (int i=0; i < size; i++) {
-            this.add(jsonArray.get(i));
+            this.add(jsonArray.getObject(i));
         }
         return this;
     }
@@ -210,7 +234,7 @@ public class JsonArray {
     public Object[] toArray() {
         Object[] arr = new Object[size()];
         for (int i=0; i<size(); i++) {
-            arr[i] = get(i);
+            arr[i] = getObject(i);
         }
         return arr;
     }

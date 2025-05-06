@@ -96,28 +96,28 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
     }
 
     @Override
-    public Object get(String key) {
+    public Object getObject(String key) {
         JsonNode v = on.get(key);
         if (null == v || v.isNull()) {
             return null;
-        } else if (v.isInt()) {
-            return v.asInt();
-        } else if (v.isLong()) {
-            return v.asLong();
-        } else if (v.isShort()) {
-            return v.asInt(); // no asShort in ObjectNode, why?
-        } else if (v.isDouble()) {
-            return v.asDouble();
-        } else if (v.isFloat()) {
-            return v.asDouble(); // and so?
-        } else if (v.isBoolean()) {
-            return v.asBoolean();
-        } else if (v.isTextual()) {
-            return v.asText();
         } else if (v.isObject()) {
             return new JsonObjectProxy4Jackson((ObjectNode) v);
         } else if (v.isArray()) {
             return new JsonArrayProxy4Jackson((ArrayNode) v);
+        } else if (v.isTextual()) {
+            return v.textValue();
+        } else if (v.isInt()) {
+            return v.intValue();
+        } else if (v.isLong()) {
+            return v.longValue();
+        } else if (v.isShort()) {
+            return v.shortValue();
+        } else if (v.isDouble()) {
+            return v.doubleValue();
+        } else if (v.isFloat()) {
+            return v.floatValue();
+        } else if (v.isBoolean()) {
+            return v.booleanValue();
         } else {
             return v.toString();
         }
@@ -139,7 +139,7 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
         if (null == v || v.isNull()) {
             return null;
         } else if (v.isNumber()) {
-            return v.asLong();
+            return v.longValue();
         } else {
             throw new JsonException("Can not cast '" + v.getNodeType() + "' to Long, giving key '" + key +
                     "', value '" + v + "'");
@@ -152,7 +152,7 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
         if (null == v || v.isNull()) {
             return null;
         } else if (v.isNumber()) {
-            return v.asInt();
+            return v.intValue();
         } else {
             throw new JsonException("Can not cast '" + v.getNodeType() + "' to Integer, giving key '" + key +
                     "', value '" + v + "'");
@@ -165,7 +165,7 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
         if (null == v || v.isNull()) {
             return null;
         } else if (v.isNumber()) {
-            return (short) v.asInt();
+            return v.shortValue();
         } else {
             throw new JsonException("Can not cast '" + v.getNodeType() + "' to Short, giving key '" + key +
                     "', value '" + v + "'");
@@ -178,7 +178,7 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
         if (null == v || v.isNull()) {
             return null;
         } else if (v.isNumber()) {
-            return v.asDouble();
+            return v.doubleValue();
         } else {
             throw new JsonException("Can not cast '" + v.getNodeType() + "' to Double, giving key '" + key +
                     "', value '" + v + "'");
@@ -191,7 +191,7 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
         if (null == v || v.isNull()) {
             return null;
         } else if (v.isNumber()) {
-            return (float) v.asDouble();
+            return v.floatValue();
         } else {
             throw new JsonException("Can not cast '" + v.getNodeType() + "' to Float, giving key '" + key +
                     "', value '" + v + "'");
@@ -204,7 +204,7 @@ public class JsonObjectProxy4Jackson implements JsonObjectProxy {
         if (null == v || v.isNull()) {
             return null;
         } else if (v.isBoolean()) {
-            return v.asBoolean();
+            return v.booleanValue();
         } else {
             throw new JsonException("Can not cast '" + v.getNodeType() + "' to Boolean, giving key '" + key +
                     "', value '" + v + "'");

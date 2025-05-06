@@ -1,6 +1,5 @@
 package com.outofstack.metaplus.common.json;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class JsonDiff {
                 // -, !
                 for (String key : leftJo.keySet()) {
                     if (rightJo.containsKey(key)) {
-                        diffRecursively(diffList, path + "." + key, leftJo.get(key), rightJo.get(key));
+                        diffRecursively(diffList, path + "." + key, leftJo.getObject(key), rightJo.getObject(key));
                     } else {
                         diffList.add(new String[] { path + "." + key, "-" });
                     }
@@ -51,7 +50,7 @@ public class JsonDiff {
                 int size = Math.max(leftJa.size(), rightJa.size());
                 for (int i = 0; i < size; i++) {
                     if (i < leftJa.size() && i < rightJa.size()) {
-                        diffRecursively(diffList, path + "[" + i + "]", leftJa.get(i), rightJa.get(i));
+                        diffRecursively(diffList, path + "[" + i + "]", leftJa.getObject(i), rightJa.getObject(i));
                     } else if (i < leftJa.size()) {
                         diffList.add(new String[] { path + "[" + i + "]", "-" });
                     } else {

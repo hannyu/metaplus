@@ -58,7 +58,8 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
     }
 
     @Override
-    public Object get(int idx) {
+    public Object getObject(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             Object v = ja.get(idx);
             if (v instanceof JSONObject) {
@@ -76,11 +77,13 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public String getString(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         return ja.getString(idx);
     }
 
     @Override
     public Long getLong(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             return ja.getLong(idx);
         } catch (RuntimeException e) {
@@ -90,6 +93,7 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public Integer getInteger(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             return ja.getInteger(idx);
         } catch (RuntimeException e) {
@@ -99,6 +103,7 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public Short getShort(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             return ja.getShort(idx);
         } catch (RuntimeException e) {
@@ -108,6 +113,7 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public Double getDouble(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             return ja.getDouble(idx);
         } catch (RuntimeException e) {
@@ -117,6 +123,7 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public Float getFloat(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             return ja.getFloat(idx);
         } catch (RuntimeException e) {
@@ -126,6 +133,7 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public Boolean getBoolean(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             return ja.getBoolean(idx);
         } catch (RuntimeException e) {
@@ -140,6 +148,7 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public JsonObjectProxy getJsonObjectProxy(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             Object v = ja.get(idx);
             if (v == null) {
@@ -158,6 +167,7 @@ public class JsonArrayProxy4Fastjson2 implements JsonArrayProxy {
 
     @Override
     public JsonArrayProxy getJsonArrayProxy(int idx) {
+        if (idx < 0 || idx >= size()) return null;
         try {
             Object v = ja.get(idx);
             if (v == null) {

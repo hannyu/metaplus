@@ -2,9 +2,6 @@ package com.outofstack.metaplus.common.json;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -85,7 +82,7 @@ class JsonArrayTest {
 
         ja1 = JsonArray.parse("[\"number\",5,null,[\"gaga\",\"haha\"],45,32]");
         System.out.println(ja1);
-        assertNull(ja1.get(2));
+        assertNull(ja1.getObject(2));
 
         assertThrows(JsonException.class, () -> {
             JsonArray ja = JsonArray.parse("[\"number,5,null,[\"gaga\",\"haha\"],45,32]");

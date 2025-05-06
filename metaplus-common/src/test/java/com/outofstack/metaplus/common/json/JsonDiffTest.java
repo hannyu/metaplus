@@ -13,7 +13,7 @@ public class JsonDiffTest {
         String json1 = "{" +
                 "   \"a\": [" +
                 "       {\"bb\":5}," +
-                "       {\"cc\":6}," +
+                "       {\"cc\":6}" +
                 "   ]," +
                 "   \"x\": \"sss\"," +
                 "   \"n\": {" +
@@ -23,7 +23,7 @@ public class JsonDiffTest {
         String json2 = "{" +
                 "   \"a\": [" +
                 "       {\"bb\":5}," +
-                "       {\"cc\":7}," +
+                "       {\"cc\":7}" +
                 "   ]," +
                 "   \"y\": \"sss\"," +
                 "   \"n\": {" +

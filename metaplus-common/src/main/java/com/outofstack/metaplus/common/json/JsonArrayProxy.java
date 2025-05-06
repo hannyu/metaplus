@@ -1,14 +1,12 @@
 package com.outofstack.metaplus.common.json;
 
-import java.io.Reader;
-
 public interface JsonArrayProxy {
 
     String toJson();
 
     int size();
     boolean isEmpty();
-    Object get(int idx);
+    Object getObject(int idx);
     String getString(int idx);
     Long getLong(int idx);
     Integer getInteger(int idx);
