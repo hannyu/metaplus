@@ -11,8 +11,6 @@ public abstract class AbstractDao {
     @Autowired
     protected DomainLib domainLib;
 
-
-
     public static final String SCRIPT_FUNC_MERGE =
             " void merge(def obj1, def obj2) { " +
                 " if (obj1 == null || obj2 == null) { return; }" +

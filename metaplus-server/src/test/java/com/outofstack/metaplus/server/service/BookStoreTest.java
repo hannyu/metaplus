@@ -81,7 +81,7 @@ public class BookStoreTest {
         // express
         Properties fqmn = new Properties();
         Field name = new Field("keyword");
-        name.setExpression("'isbn-'+meta.cat+'-'+meta.isbn");
+        name.setValueExpr("'isbn-'+meta.cat+'-'+meta.isbn");
         fqmn.putProperty("name", name);
         mappings.putProperty("fqmn", fqmn);
 

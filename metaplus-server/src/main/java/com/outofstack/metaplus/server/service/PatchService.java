@@ -63,7 +63,7 @@ public class PatchService extends AbstractService{
         // 2 validate privilege
         validatePrivilege();
 
-        // 3 build
+        // 3. build
         MetaplusDoc doc = patch.getDoc();
         if (null == doc) {
             throw new MetaplusException("Giving patch must have doc.");

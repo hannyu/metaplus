@@ -315,10 +315,10 @@ public class DomainLib {
                 }
 
                 // add expression
-                String expression = field.getExpression();
-                if (null != expression && !expression.isEmpty()) {
-                    expression = jsonPath.substring(2) + "." + key + " = " + expression + ";";
-                    expressions.add(Map.entry(field.getExpressionOrder(), expression));
+                String valueExpr = field.getValueExpr();
+                if (null != valueExpr && !valueExpr.isEmpty()) {
+                    valueExpr = jsonPath.substring(2) + "." + key + " = " + valueExpr + ";";
+                    expressions.add(Map.entry(field.getExprOrder(), valueExpr));
                 }
             } else {
                 throw new IllegalArgumentException("Invalid property '" + property + "' with key '" + key + "'");

@@ -1,0 +1,103 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = "com.outofstack.metaplus"
+version = "$metaplus_version"
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation(project(":metaplus-common"))
+
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.apache.httpcomponents.client5:httpclient5")
+
+    implementation "org.slf4j:slf4j-api:$slf4j_version"
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+//    jvmArgs(['-XX:+EnableDynamicAgentLoading', '-Xshare:off'])
+}
+
+// package
+
+//// 1. 修改JAR包名称和输出目录
+//tasks.named('jar') {
+//    archiveFileName = 'metaplus.jar'  // 固定JAR名称
+//    destinationDirectory = file("$buildDir/libs")
+//}
+
+// 2.
+tasks.register('packageApp', Copy) {
+    dependsOn bootJar
+    def targetDir = "$buildDir/dist"
+//    def targetDir = layout.buildDirectory.dir("dist/metaplus-server")
+
+    delete targetDir;
+
+    into targetDir;
+
+    // 复制JAR到lib目录
+    into("$targetDir/lib") {
+        from bootJar
+    }
+
+    // 复制依赖JAR到lib目录
+    into("$targetDir/lib") {
+        from configurations.runtimeClasspath
+    }
+
+    // 生成bin/start.sh脚本
+    into("$targetDir/bin") {
+        from 'bin/start.sh'
+        fileMode 0755  // 赋予可执行权限
+    }
+
+    // 复制配置文件模板到config目录
+    into("$targetDir/config") {
+        from 'src/main/resources/application.yml'
+        from 'src/main/resources/logback.yml'
+    }
+
+    // 复制配置文件模板到config目录
+    into("$targetDir/bin") {
+        from 'src/main/scripts/start.sh'
+    }
+
+    // 创建空log目录
+    doLast {
+        mkdir "$targetDir/log"
+    }
+}
+
+// 创建ZIP归档任务
+tasks.register('packageZip', Zip) {
+    dependsOn packageApp
+
+    from "${buildDir}/dist"
+    archiveFileName = "metaplus-server-${version}.zip"
+    destinationDirectory = file("${buildDir}")
+}
+
+

@@ -46,7 +46,7 @@ public class DomainLibTest {
                 assertTrue(rule.getRequired());
             }
             if ("$.meta.index.extend".equals(rule.getJsonPath())) {
-                assertEquals("none", rule.getDefault());
+                assertEquals("none", rule.getDefaultValue());
             }
         }
     }

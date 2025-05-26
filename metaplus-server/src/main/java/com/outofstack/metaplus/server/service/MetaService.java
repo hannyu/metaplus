@@ -43,7 +43,7 @@ public class MetaService extends AbstractService{
         fixupSyncUpdated(doc);
         trim2MetaOnly(doc);
 
-        // 3 update doc
+        // 4 update doc
         docDao.update(doc);
     }
 

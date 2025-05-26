@@ -10,8 +10,9 @@ public class Field extends JsonObject {
     public static final String KEY_DEFAULT = "#default";
     public static final String KEY_COMMENT = "#comment";
     public static final String KEY_SAMPLES = "#samples";
-    public static final String KEY_EXPRESSION = "#expression";
-    public static final String KEY_EXPRESSION_ORDER = "#expressionOrder";
+    public static final String KEY_VALUE_EXPR = "#valueExpr";
+    public static final String KEY_EXPR_ORDER = "#exprOrder";
+    public static final String KEY_FORCE_LOWERCASE = "#forceLowercase";
 
 //    public static final String TYPE_KEYWORD = "keyword";
 //    public static final String TYPE_TEXT = "text";
@@ -108,17 +109,22 @@ public class Field extends JsonObject {
     public void setDefault(Object defaultValue) {
         put(KEY_DEFAULT, defaultValue);
     }
-    public String getExpression() {
-        return getString(KEY_EXPRESSION);
+    public String getValueExpr() {
+        return getString(KEY_VALUE_EXPR);
     }
-    public void setExpression(String expression) {
-        put(KEY_EXPRESSION, expression);
+    public void setValueExpr(String valueExpr) {
+        put(KEY_VALUE_EXPR, valueExpr);
     }
-    public int getExpressionOrder() {
-        Integer order = getInteger(KEY_EXPRESSION_ORDER);
+    public int getExprOrder() {
+        Integer order = getInteger(KEY_EXPR_ORDER);
         return order == null ? 10 : order;
     }
-    public void setExpressionOrder(int expressionOrder) {
-        put(KEY_EXPRESSION_ORDER, expressionOrder);
+    public void setExprOrder(int exprOrder) {
+        put(KEY_EXPR_ORDER, exprOrder);
     }
+
+    public Boolean getForceLowercase() {
+        return getBoolean(KEY_FORCE_LOWERCASE);
+    }
+
 }
